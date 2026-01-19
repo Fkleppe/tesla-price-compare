@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Tesla Model 3 All-Weather Floor Mats",
+    "price": 129.99,
+    "category": "Model 3",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-3-all-weather-floor-mats",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Model Y Cargo Mat",
+    "price": 89.99,
+    "category": "Model Y",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-y-cargo-mat",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Wall Connector Gen 3",
+    "price": 425,
+    "category": "Charging",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-wall-connector-gen-3",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Model 3 Center Console Wrap",
+    "price": 34.99,
+    "category": "Model 3",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-3-center-console-wrap",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Screen Protector 15\" Display",
+    "price": 29.99,
+    "category": "Accessories",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-screen-protector-15\"-display",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Model Y Roof Rack",
+    "price": 449,
+    "category": "Model Y",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-y-roof-rack",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Wireless Phone Charger",
+    "price": 79.99,
+    "category": "Accessories",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-wireless-phone-charger",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Model 3 Mud Flaps",
+    "price": 44.99,
+    "category": "Model 3",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-3-mud-flaps",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Portable Tire Inflator",
+    "price": 59.99,
+    "category": "Accessories",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-portable-tire-inflator",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  },
+  {
+    "title": "Tesla Model Y Window Tint Kit",
+    "price": 149.99,
+    "category": "Model Y",
+    "currency": "USD",
+    "url": "https://example.com/products/tesla-model-y-window-tint-kit",
+    "source": "Demo",
+    "scrapedAt": "2026-01-14T21:37:25.501Z"
+  }
+]

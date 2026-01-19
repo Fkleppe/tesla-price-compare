@@ -1,0 +1,350 @@
+@import "tailwindcss";
+
+/* ========================================
+   TESLA-INSPIRED DESIGN SYSTEM
+   Sharp corners, light background, minimal
+   ======================================== */
+
+:root {
+  /* Tesla Colors - Authentic */
+  --tesla-red: #E82127;
+  --tesla-red-hover: #CC1E22;
+  --tesla-black: #171717;
+  --tesla-dark: #393c41;
+  --tesla-white: #FFFFFF;
+  --tesla-off-white: #F4F4F4;
+  --tesla-gray-100: #f5f5f5;
+  --tesla-gray-200: #e8e8e8;
+  --tesla-gray-300: #d5d5d5;
+  --tesla-gray-400: #b3b3b3;
+  --tesla-gray-500: #8e8e8e;
+  --tesla-gray-600: #6e6e6e;
+  --tesla-gray-700: #5c5e62;
+  --tesla-gray-800: #393c41;
+  --tesla-green: #12805c;
+  --tesla-green-light: #e8f5e9;
+  --tesla-border: #e8e8e8;
+
+  /* Typography Scale */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 40px;
+  --text-5xl: 56px;
+
+  /* Spacing - generous whitespace */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 96px;
+
+  /* Transitions - subtle */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--tesla-white);
+  color: var(--tesla-black);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+/* ========================================
+   TYPOGRAPHY - Tesla Style
+   Clean, modern, no frills
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--tesla-black);
+}
+
+/* ========================================
+   BUTTONS - Tesla Style (Sharp corners!)
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: none;
+  border-radius: 0; /* Tesla = sharp corners */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--tesla-black);
+  color: var(--tesla-white);
+}
+
+.btn-primary:hover {
+  background: var(--tesla-dark);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--tesla-dark);
+  border: 3px solid var(--tesla-dark);
+}
+
+.btn-secondary:hover {
+  background: var(--tesla-dark);
+  color: var(--tesla-white);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--tesla-gray-700);
+  border: 1px solid var(--tesla-border);
+}
+
+.btn-outline:hover {
+  border-color: var(--tesla-gray-500);
+}
+
+/* ========================================
+   CARDS - Tesla Style (Minimal border-radius)
+   ======================================== */
+
+.card {
+  background: var(--tesla-white);
+  border: 1px solid var(--tesla-border);
+  border-radius: 0;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   INPUTS - Tesla Style
+   ======================================== */
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--tesla-black);
+  background: var(--tesla-gray-100);
+  border: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  background: var(--tesla-white);
+  border-color: var(--tesla-gray-300);
+}
+
+.input::placeholder {
+  color: var(--tesla-gray-500);
+}
+
+/* ========================================
+   TABS - Tesla Style Category Tabs
+   ======================================== */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--tesla-border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  padding: 16px 24px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--tesla-gray-600);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+.tab:hover {
+  color: var(--tesla-black);
+}
+
+.tab.active {
+  color: var(--tesla-black);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--tesla-black);
+}
+
+/* ========================================
+   MODAL - Tesla Style
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  animation: fadeIn var(--transition-fast) forwards;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  background: var(--tesla-white);
+  border-radius: 0;
+  overflow: hidden;
+  z-index: 101;
+  animation: slideUp var(--transition-normal) forwards;
+}
+
+/* ========================================
+   PRICE DISPLAY - Tesla Style
+   ======================================== */
+
+.price {
+  font-weight: 500;
+  color: var(--tesla-black);
+}
+
+.price-savings {
+  color: var(--tesla-green);
+  font-weight: 500;
+}
+
+/* ========================================
+   ANIMATIONS - Subtle only
+   ======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* ========================================
+   SCROLLBAR - Minimal
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tesla-gray-300);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tesla-gray-400);
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+.divider {
+  height: 1px;
+  background: var(--tesla-border);
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--tesla-black);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth transitions on interactive elements */
+a, button, input, select {
+  transition: all var(--transition-fast);
+}
