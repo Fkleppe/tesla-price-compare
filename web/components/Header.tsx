@@ -30,7 +30,7 @@ export default function Header({
       <div className="header-container">
         <div className="header-left">
           <Link href="/" className="logo">
-            Tesla<span className="logo-accent">Compare</span>
+            EV<span className="logo-accent">PriceHunt</span>
           </Link>
 
           <nav className="nav">

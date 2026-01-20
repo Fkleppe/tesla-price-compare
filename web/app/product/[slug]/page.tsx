@@ -138,7 +138,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!result) {
     return {
-      title: 'Product Not Found | TeslaCompare',
+      title: 'Product Not Found | EVPriceHunt',
       description: 'The product you are looking for could not be found.',
     };
   }
@@ -150,7 +150,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const categoryName = CATEGORY_NAMES[product.category] || product.category;
 
   // Create concise, keyword-rich title (under 60 chars ideally)
-  // Note: Layout template will append "| TeslaCompare" automatically
+  // Note: Layout template will append "| EVPriceHunt" automatically
   let title = product.title;
   if (title.length > 45) {
     // Cut at word boundary
@@ -204,7 +204,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       images: product.image ? [{ url: product.image, width: 800, height: 600, alt: product.title }] : [],
       type: 'website',
-      siteName: 'TeslaCompare',
+      siteName: 'EVPriceHunt',
     },
     twitter: {
       card: 'summary_large_image',
@@ -336,7 +336,7 @@ function generateFAQJsonLd(product: Product) {
       question: `How do I get the best price on this ${categoryName.toLowerCase()}?`,
       answer: discountInfo
         ? `Use the exclusive discount code "${discountInfo.code}" at checkout on ${product.source} to save ${discountInfo.percent}% off the regular price of $${product.price.toFixed(2)}. This brings your final price to just $${(product.price * (1 - discountInfo.percent / 100)).toFixed(2)}.`
-        : `The current price at ${product.source} is $${product.price.toFixed(2)}. Check TeslaCompare regularly for exclusive discount codes and seasonal promotions. Signing up for the retailer's newsletter may also unlock first-time buyer discounts.`
+        : `The current price at ${product.source} is $${product.price.toFixed(2)}. Check EVPriceHunt regularly for exclusive discount codes and seasonal promotions. Signing up for the retailer's newsletter may also unlock first-time buyer discounts.`
     },
     {
       question: `What is ${product.source}'s return policy?`,

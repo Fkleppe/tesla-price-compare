@@ -432,7 +432,7 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
                   and many products come with exclusive discount codes that can save you up to 20% off.
                 </p>
                 <h3 style={{ fontSize: 18, fontWeight: 600, color: '#111', marginTop: 24, marginBottom: 12 }}>
-                  Why Shop for {category.name} with TeslaCompare?
+                  Why Shop for {category.name} with EVPriceHunt?
                 </h3>
                 <ul style={{ paddingLeft: 20 }}>
                   <li style={{ marginBottom: 8 }}>Compare prices from {stats.totalStores}+ verified Tesla accessory stores</li>

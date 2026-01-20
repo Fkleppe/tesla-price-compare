@@ -185,7 +185,7 @@ export default function ModelsPage() {
           </h2>
           <div style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
             <p style={{ marginBottom: 16 }}>
-              Finding the right accessories for your Tesla is easy with TeslaCompare. We've organized
+              Finding the right accessories for your Tesla is easy with EVPriceHunt. We've organized
               our entire catalog by Tesla model, so you can quickly find products that are guaranteed
               to fit your specific vehicle.
             </p>

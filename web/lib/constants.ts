@@ -1,8 +1,8 @@
 // Centralized constants for the application
 
-export const SITE_NAME = 'TeslaCompare';
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://teslacompare.com';
-export const SITE_DESCRIPTION = 'Compare prices on Tesla accessories across multiple stores. Find the best deals with exclusive discount codes.';
+export const SITE_NAME = 'EVPriceHunt';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://evpricehunt.com';
+export const SITE_DESCRIPTION = 'Compare prices on Tesla and EV accessories across multiple stores. Find the best deals with exclusive discount codes.';
 
 export const TESLA_MODELS = [
   { id: 'model-3', name: 'Model 3', shortName: '3' },

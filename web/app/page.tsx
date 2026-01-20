@@ -878,7 +878,7 @@ export default function Home() {
             Compare Tesla Accessory Prices in 2025
           </h1>
           <p style={{ fontSize: 17, color: '#4b5563', lineHeight: 1.8, textAlign: 'center', maxWidth: 800, margin: '0 auto 48px' }}>
-            TeslaCompare helps you find the best deals on Tesla accessories from verified retailers.
+            EVPriceHunt helps you find the best deals on Tesla and EV accessories from verified retailers.
             Compare prices across {stats.totalStores}+ stores, find exclusive discount codes, and save up to 20% on floor mats,
             screen protectors, charging accessories, and more for Model 3, Model Y, Model S, Model X, and Cybertruck.
           </p>
@@ -990,7 +990,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, marginBottom: 32 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 16 }}>
-                Tesla<span style={{ color: '#E82127' }}>Compare</span>
+                EV<span style={{ color: '#E82127' }}>PriceHunt</span>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.6 }}>
                 Find the best deals on Tesla accessories with exclusive discount codes from verified retailers.
@@ -1050,7 +1050,7 @@ export default function Home() {
             </div>
           </div>
           <div style={{ borderTop: '1px solid #333', paddingTop: 24, textAlign: 'center' }}>
-            <p style={{ fontSize: 12 }}>© 2025 TeslaCompare by Statika AS. Not affiliated with Tesla, Inc.</p>
+            <p style={{ fontSize: 12 }}>© 2025 EVPriceHunt by Statika AS. Not affiliated with Tesla, Inc.</p>
           </div>
         </div>
       </footer>

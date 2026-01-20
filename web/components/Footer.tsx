@@ -14,10 +14,10 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link href="/" className="footer-logo">
-              Tesla<span className="logo-accent">Compare</span>
+              EV<span className="logo-accent">PriceHunt</span>
             </Link>
             <p className="footer-desc">
-              Find the best deals on Tesla accessories with exclusive discount codes from verified retailers.
+              Find the best deals on Tesla and EV accessories with exclusive discount codes from verified retailers.
             </p>
             <p className="footer-company">
               Operated by Statika AS, Norway
