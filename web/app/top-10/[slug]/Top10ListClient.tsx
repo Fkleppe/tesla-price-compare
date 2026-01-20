@@ -22,6 +22,137 @@ interface Product {
   vendor?: string;
 }
 
+// Curated mattress products linking to teslamattress.com
+const CURATED_MATTRESS_PRODUCTS: Product[] = [
+  {
+    title: 'Snuuzu Tesla Mattress for Model Y',
+    price: 899,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#snuuzu',
+    image: 'https://www.snuuzu.com/cdn/shop/files/MY_black_3.jpg?v=1731661468&width=800',
+    source: 'Snuuzu',
+    sourceId: 'snuuzu',
+    category: 'camping',
+    models: ['model-y'],
+    description: 'Premium memory foam mattress designed specifically for Tesla Model Y. Self-inflating with built-in pump.',
+  },
+  {
+    title: 'Snuuzu Tesla Mattress for Model 3',
+    price: 899,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#snuuzu',
+    image: 'https://www.snuuzu.com/cdn/shop/files/M3_black_4.jpg?v=1731661582&width=800',
+    source: 'Snuuzu',
+    sourceId: 'snuuzu',
+    category: 'camping',
+    models: ['model-3'],
+    description: 'Premium memory foam mattress designed specifically for Tesla Model 3. Self-inflating with built-in pump.',
+  },
+  {
+    title: 'Havnby Autolevel Foam Mattress',
+    price: 359.99,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#havnby',
+    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-autolevelfoam-4.jpg?v=1734366792&width=800',
+    source: 'Havnby',
+    sourceId: 'havnby',
+    category: 'camping',
+    models: ['model-y', 'model-3'],
+    description: 'Self-leveling foam mattress that adjusts to the trunk slope. No inflation needed.',
+  },
+  {
+    title: 'TESMAT Luxe Mattress for Model Y',
+    price: 379,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#tesmat',
+    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Model_Y_Lifestyle_01.jpg?v=1687889374&width=800',
+    source: 'TESMAT',
+    sourceId: 'tesmat',
+    category: 'camping',
+    models: ['model-y'],
+    description: 'Dual-zone memory foam mattress with cooling gel layer. Fits perfectly in Model Y.',
+  },
+  {
+    title: 'TESMAT Luxe Mattress for Model 3',
+    price: 379,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#tesmat',
+    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Model_3_Lifestyle_01.jpg?v=1687889374&width=800',
+    source: 'TESMAT',
+    sourceId: 'tesmat',
+    category: 'camping',
+    models: ['model-3'],
+    description: 'Dual-zone memory foam mattress with cooling gel layer. Fits perfectly in Model 3.',
+  },
+  {
+    title: 'Tesery NovaPads Tesla Mattress',
+    price: 289,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#tesery',
+    image: 'https://www.tesery.com/cdn/shop/files/novapads-camping-mattress-for-tesla-model-y-model-3-660695.jpg?v=1734503477&width=800',
+    source: 'Tesery',
+    sourceId: 'tesery',
+    category: 'camping',
+    models: ['model-y', 'model-3'],
+    description: 'Budget-friendly memory foam mattress with good support. Great value option.',
+  },
+  {
+    title: 'Havnby Foam Mattress for Model Y/3',
+    price: 259,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#havnby',
+    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-original-10.jpg?v=1731575193&width=800',
+    source: 'Havnby',
+    sourceId: 'havnby',
+    category: 'camping',
+    models: ['model-y', 'model-3'],
+    description: 'Original foam mattress from Havnby. Simple design, comfortable sleep.',
+  },
+  {
+    title: 'Havnby Autolevel Solo Mattress',
+    price: 239.99,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#havnby',
+    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-autolevelfoam-solo-4.jpg?v=1734366898&width=800',
+    source: 'Havnby',
+    sourceId: 'havnby',
+    category: 'camping',
+    models: ['model-y', 'model-3'],
+    description: 'Single-person self-leveling mattress. Perfect for solo camping trips.',
+  },
+  {
+    title: 'TESMAT Solo Mattress for Model Y',
+    price: 139,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#tesmat',
+    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Solo_Model_Y.jpg?v=1687889374&width=800',
+    source: 'TESMAT',
+    sourceId: 'tesmat',
+    category: 'camping',
+    models: ['model-y'],
+    description: 'Compact single-person mattress for Model Y. Affordable entry option.',
+  },
+  {
+    title: 'TESMAT Solo Mattress for Model 3',
+    price: 139,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#tesmat',
+    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Solo_Model_3.jpg?v=1687889374&width=800',
+    source: 'TESMAT',
+    sourceId: 'tesmat',
+    category: 'camping',
+    models: ['model-3'],
+    description: 'Compact single-person mattress for Model 3. Affordable entry option.',
+  },
+];
+
+// Discount info for curated mattress products
+const MATTRESS_DISCOUNTS: Record<string, { code: string; percent: number }> = {
+  'Snuuzu': { code: 'KLEPPE', percent: 10 },
+  'Havnby': { code: 'AWD', percent: 10 },
+  'Tesery': { code: '123', percent: 5 },
+};
+
 interface TopList {
   id: string;
   title: string;
@@ -38,7 +169,16 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Check if this is a curated list
+  const isCuratedMattressList = list.id === 'mattress';
+
   useEffect(() => {
+    // Skip API fetch for curated mattress list
+    if (isCuratedMattressList) {
+      setLoading(false);
+      return;
+    }
+
     fetch('/api/products')
       .then(r => r.json())
       .then(data => {
@@ -46,9 +186,14 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [isCuratedMattressList]);
 
   const getTopProducts = (listData: TopList): Product[] => {
+    // Return curated list for mattress
+    if (listData.id === 'mattress') {
+      return CURATED_MATTRESS_PRODUCTS;
+    }
+
     let filtered = products.filter(p => isAffiliatePartner(p.url));
 
     // Filter by keywords
@@ -73,7 +218,12 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
     return filtered.slice(0, 10);
   };
 
-  const topProducts = useMemo(() => getTopProducts(list), [products, list]);
+  // Helper to get discount for curated products
+  const getCuratedDiscount = (source: string) => {
+    return MATTRESS_DISCOUNTS[source] || null;
+  };
+
+  const topProducts = useMemo(() => getTopProducts(list), [products, list, isCuratedMattressList]);
 
   const stats = useMemo(() => {
     const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
@@ -142,7 +292,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
               fontSize: 13,
               fontWeight: 600
             }}>
-              Updated January 2025
+              Updated January 2026
             </div>
           </div>
         </section>
@@ -203,8 +353,12 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {topProducts.map((product, index) => {
-                  const discount = getDiscountInfo(product.url);
-                  const affiliateUrl = getAffiliateUrl(product.url);
+                  const discount = isCuratedMattressList
+                    ? getCuratedDiscount(product.source)
+                    : getDiscountInfo(product.url);
+                  const affiliateUrl = isCuratedMattressList
+                    ? product.url
+                    : getAffiliateUrl(product.url);
                   const discountedPrice = discount
                     ? (product.price * (1 - discount.percent / 100)).toFixed(2)
                     : null;
@@ -361,20 +515,22 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
                           </div>
 
                           <div style={{ display: 'flex', gap: 10 }}>
-                            <Link
-                              href={`/product/${generateSlug(product.title)}`}
-                              style={{
-                                padding: '12px 20px',
-                                border: '2px solid #e5e7eb',
-                                borderRadius: 10,
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: '#374151',
-                                textDecoration: 'none'
-                              }}
-                            >
-                              Details
-                            </Link>
+                            {!isCuratedMattressList && (
+                              <Link
+                                href={`/product/${generateSlug(product.title)}`}
+                                style={{
+                                  padding: '12px 20px',
+                                  border: '2px solid #e5e7eb',
+                                  borderRadius: 10,
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  color: '#374151',
+                                  textDecoration: 'none'
+                                }}
+                              >
+                                Details
+                              </Link>
+                            )}
                             <a
                               href={affiliateUrl}
                               target="_blank"
@@ -393,7 +549,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
                                 boxShadow: '0 4px 14px rgba(232, 33, 39, 0.3)'
                               }}
                             >
-                              {discount ? `Get ${discount.percent}% Off` : 'Buy Now'}
+                              {discount ? `Visit - ${discount.percent}% Off` : 'Visit Store'}
                               <span>→</span>
                             </a>
                           </div>
@@ -418,7 +574,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
               </h2>
               <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, marginBottom: 16 }}>
                 {list.description} We've carefully evaluated dozens of products to bring you the top 10 best options
-                available in 2025. We rank based on customer reviews, materials,
+                available in 2026. We rank based on customer reviews, materials,
                 compatibility across Tesla models, and overall value for money.
               </p>
               <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7 }}>

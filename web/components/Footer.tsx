@@ -19,9 +19,6 @@ export default function Footer() {
             <p className="footer-desc">
               Find the best deals on Tesla and EV accessories with exclusive discount codes from verified retailers.
             </p>
-            <p className="footer-company">
-              Operated by Statika AS, Norway
-            </p>
           </div>
 
           <div className="footer-section">
@@ -71,16 +68,12 @@ export default function Footer() {
                   </button>
                 )}
               </li>
-              <li style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>
-                Statika AS<br />
-                Norway
-              </li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {currentYear} Statika AS / {SITE_NAME}. Not affiliated with Tesla, Inc.</p>
+          <p>&copy; {currentYear} {SITE_NAME}. Not affiliated with Tesla, Inc.</p>
           <div className="footer-legal">
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms of Service</Link>

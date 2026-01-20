@@ -875,7 +875,7 @@ export default function Home() {
       <section style={{ background: '#fff', padding: '64px 24px', borderTop: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111', marginBottom: 16, textAlign: 'center' }}>
-            Compare Tesla Accessory Prices in 2025
+            Compare Tesla Accessory Prices in 2026
           </h1>
           <p style={{ fontSize: 17, color: '#4b5563', lineHeight: 1.8, textAlign: 'center', maxWidth: 800, margin: '0 auto 48px' }}>
             EVPriceHunt helps you find the best deals on Tesla and EV accessories from verified retailers.
@@ -912,7 +912,7 @@ export default function Home() {
 
             <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
-                Cybertruck Accessories 2024-2025
+                Cybertruck Accessories 2024-2026
               </h2>
               <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
                 Tesla's revolutionary pickup truck has a growing accessory ecosystem. Find bed liners,
@@ -1045,12 +1045,11 @@ export default function Home() {
                 Show Email
               </button>
               <p style={{ fontSize: 11, color: '#6b7280', marginTop: 12 }}>
-                Operated by Statika AS, Norway
               </p>
             </div>
           </div>
           <div style={{ borderTop: '1px solid #333', paddingTop: 24, textAlign: 'center' }}>
-            <p style={{ fontSize: 12 }}>© 2025 EVPriceHunt by Statika AS. Not affiliated with Tesla, Inc.</p>
+            <p style={{ fontSize: 12 }}>© 2026 EVPriceHunt. Not affiliated with Tesla, Inc.</p>
           </div>
         </div>
       </footer>

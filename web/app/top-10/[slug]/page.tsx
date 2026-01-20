@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'List Not Found' };
   }
 
-  const title = `${list.title} 2025 | Top 10 Tesla Accessories`;
-  const description = `${list.description} Compare prices from trusted retailers and save with exclusive discount codes. Updated for 2025.`;
+  const title = `${list.title} 2026 | Top 10 Tesla Accessories`;
+  const description = `${list.description} Compare prices from trusted retailers and save with exclusive discount codes. Updated for 2026.`;
 
   return {
     title,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       list.title,
       ...list.keywords,
       'Tesla accessories',
-      'best Tesla accessories 2025',
+      'best Tesla accessories 2026',
       'Tesla comparison',
       'discount codes',
     ],
@@ -87,7 +87,7 @@ function generateTop10FAQJsonLd(list: { id: string; title: string; description: 
 
   const faqs = [
     {
-      question: `What are the ${list.title.toLowerCase()} in 2025?`,
+      question: `What are the ${list.title.toLowerCase()} in 2026?`,
       answer: `${list.description} We compare products based on customer reviews, materials, and price. This list is updated monthly.`
     },
     {
@@ -104,7 +104,7 @@ function generateTop10FAQJsonLd(list: { id: string; title: string; description: 
     },
     {
       question: `How often is this ${categoryName.toLowerCase()} list updated?`,
-      answer: `We update our top 10 lists monthly to reflect new products, price changes, and customer feedback. This list was last updated in January 2025. Prices and availability are checked daily.`
+      answer: `We update our top 10 lists monthly to reflect new products, price changes, and customer feedback. This list was last updated in January 2026. Prices and availability are checked daily.`
     },
   ];
 

@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   // More SEO-optimized title with year
-  const title = `Best Tesla ${category.name} 2025 | Compare Prices & Save`;
+  const title = `Best Tesla ${category.name} 2026 | Compare Prices & Save`;
   const description = `${category.description}. Compare ${category.name.toLowerCase()} prices from top Tesla accessory stores. Save up to 20% with exclusive discount codes.`;
 
   return {
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     keywords: [
       `Tesla ${category.name.toLowerCase()}`,
-      `best Tesla ${category.name.toLowerCase()} 2025`,
+      `best Tesla ${category.name.toLowerCase()} 2026`,
       `Tesla ${category.name.toLowerCase()} comparison`,
       category.name,
       'Tesla Model 3 accessories',

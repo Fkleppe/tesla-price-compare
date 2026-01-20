@@ -6,10 +6,10 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { SITE_URL, SITE_NAME, TOP_10_LISTS } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: 'Top 10 Tesla Accessories 2025 | Best Products Ranked',
+  title: 'Top 10 Tesla Accessories 2026 | Best Products Ranked',
   description: 'Browse our Top 10 lists of Tesla accessories. Compare floor mats, screen protectors, chargers, and sunshades. Rankings updated monthly with discount codes.',
   keywords: [
-    'best Tesla accessories 2025',
+    'best Tesla accessories 2026',
     'top Tesla accessories',
     'Tesla Model 3 accessories',
     'Tesla Model Y accessories',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'Tesla accessories ranking',
   ],
   openGraph: {
-    title: 'Top 10 Tesla Accessories 2025 | Best Products Ranked',
+    title: 'Top 10 Tesla Accessories 2026 | Best Products Ranked',
     description: 'Browse our Top 10 lists of Tesla accessories. Compare floor mats, screen protectors, chargers, and sunshades.',
     url: `${SITE_URL}/top-10`,
     siteName: SITE_NAME,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Top 10 Tesla Accessories 2025',
+    title: 'Top 10 Tesla Accessories 2026',
     description: 'Top 10 lists of Tesla accessories with discount codes.',
   },
   alternates: {
@@ -149,7 +149,7 @@ export default function Top10IndexPage() {
                 fontSize: 13,
                 fontWeight: 600
               }}>
-                Updated January 2025
+                Updated January 2026
               </div>
             </div>
           </section>

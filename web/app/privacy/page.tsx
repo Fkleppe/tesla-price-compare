@@ -38,7 +38,7 @@ export default function PrivacyPage() {
           </h1>
 
           <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 32 }}>
-            Last updated: January 2025
+            Last updated: January 2026
           </p>
 
           <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.8 }}>

@@ -1793,7 +1793,7 @@ export default function ProductPageClient({
           </div>
           <div style={{ borderTop: '1px solid #333', paddingTop: 24, textAlign: 'center' }}>
             <p style={{ fontSize: 12 }}>
-              © 2025 EVPriceHunt by Statika AS. Not affiliated with Tesla, Inc. All prices subject to change.
+              © 2026 EVPriceHunt. Not affiliated with Tesla, Inc. All prices subject to change.
             </p>
           </div>
         </div>
