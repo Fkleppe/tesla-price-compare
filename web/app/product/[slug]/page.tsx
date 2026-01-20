@@ -32,7 +32,7 @@ function generateSlug(title: string): string {
 // Get all products (filtered: price >= $10, affiliate partners only)
 async function getProducts(): Promise<Product[]> {
   try {
-    const dataPath = path.join(process.cwd(), '..', 'data', 'latest.json');
+    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     const allProducts: Product[] = JSON.parse(data);
     return allProducts.filter(p => p.price >= 10 && isAffiliatePartner(p.url));

@@ -10,7 +10,7 @@ interface Product {
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const dataPath = path.join(process.cwd(), '..', 'data', 'latest.json');
+    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     return JSON.parse(data);
   } catch {
@@ -29,6 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/top-10`,

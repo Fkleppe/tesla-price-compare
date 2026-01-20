@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
-import { getDiscountInfo } from '@/lib/affiliate';
+import { getDiscountInfo, getAffiliateUrl } from '@/lib/affiliate';
 import { generateSlug, MODEL_LABELS, formatPrice } from '@/lib/constants';
 
 interface ProductCardProps {
@@ -14,74 +14,93 @@ interface ProductCardProps {
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const discount = getDiscountInfo(product.url);
   const slug = generateSlug(product.title);
+  const affiliateUrl = getAffiliateUrl(product.url);
   const discountedPrice = discount
     ? product.price * (1 - discount.percent / 100)
     : product.price;
 
   return (
-    <Link href={`/product/${slug}`} className="product-card">
-      <div className="product-image-container">
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.title}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="product-image"
-            priority={priority}
-          />
-        ) : (
-          <div className="product-image-placeholder">No Image</div>
-        )}
-        {discount && (
-          <span className="discount-badge">{discount.percent}% OFF</span>
-        )}
-      </div>
-
-      <div className="product-content">
-        <div className="product-meta">
-          <span className="product-source">{product.source}</span>
-          {product.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
-            <span key={m} className="product-model">{MODEL_LABELS[m]?.split(' ').pop() || m}</span>
-          ))}
-        </div>
-
-        <h3 className="product-title">{product.title}</h3>
-
-        <div className="product-price">
-          {discount ? (
-            <>
-              <span className="price-discounted">{formatPrice(discountedPrice)}</span>
-              <span className="price-original">{formatPrice(product.price)}</span>
-            </>
+    <div className="product-card">
+      <Link href={`/product/${slug}`} className="product-link">
+        <div className="product-image-container">
+          {product.image ? (
+            <Image
+              src={product.image}
+              alt={product.title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="product-image"
+              priority={priority}
+            />
           ) : (
-            <span className="price-current">{formatPrice(product.price)}</span>
+            <div className="product-image-placeholder">No Image</div>
+          )}
+          {discount && (
+            <span className="discount-badge">{discount.percent}% OFF</span>
           )}
         </div>
 
-        {discount && (
-          <div className="discount-code">
-            <span className="discount-label">Use code:</span>
-            <span className="discount-value">{discount.code}</span>
+        <div className="product-content">
+          <div className="product-meta">
+            <span className="product-source">{product.source}</span>
+            {product.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
+              <span key={m} className="product-model">{MODEL_LABELS[m]?.split(' ').pop() || m}</span>
+            ))}
           </div>
-        )}
+
+          <h3 className="product-title">{product.title}</h3>
+
+          <div className="product-price">
+            {discount ? (
+              <>
+                <span className="price-discounted">{formatPrice(discountedPrice)}</span>
+                <span className="price-original">{formatPrice(product.price)}</span>
+              </>
+            ) : (
+              <span className="price-current">{formatPrice(product.price)}</span>
+            )}
+          </div>
+
+          {discount && (
+            <div className="discount-code">
+              <span className="discount-label">Use code:</span>
+              <span className="discount-value">{discount.code}</span>
+            </div>
+          )}
+        </div>
+      </Link>
+
+      <div className="visit-button-container">
+        <a
+          href={affiliateUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="visit-button"
+        >
+          Visit {product.source} →
+        </a>
       </div>
 
       <style jsx>{`
         .product-card {
-          display: block;
+          display: flex;
+          flex-direction: column;
           background: #fff;
           border-radius: 12px;
           overflow: hidden;
           border: 1px solid #e5e7eb;
-          text-decoration: none;
-          color: inherit;
           transition: all 0.2s ease;
         }
         .product-card:hover {
           border-color: #d1d5db;
           box-shadow: 0 4px 12px rgba(0,0,0,0.08);
           transform: translateY(-2px);
+        }
+        .product-link {
+          display: block;
+          text-decoration: none;
+          color: inherit;
+          flex: 1;
         }
         .product-image-container {
           position: relative;
@@ -178,7 +197,26 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           color: #15803d;
           font-family: monospace;
         }
+        .visit-button-container {
+          padding: 0 14px 14px;
+        }
+        .visit-button {
+          display: block;
+          width: 100%;
+          padding: 10px;
+          background: #E82127;
+          color: #fff;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 600;
+          text-decoration: none;
+          text-align: center;
+          transition: background 0.2s ease;
+        }
+        .visit-button:hover {
+          background: #c91c21;
+        }
       `}</style>
-    </Link>
+    </div>
   );
 }

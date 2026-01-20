@@ -375,7 +375,11 @@ export default function Home() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#a3a3a3' }}>
-            <span><strong style={{ color: '#fff' }}>{stats.totalProducts.toLocaleString()}</strong> Products</span>
+            {viewMode === 'products' ? (
+              <span><strong style={{ color: '#fff' }}>{filteredProducts.length.toLocaleString()}</strong> Products</span>
+            ) : (
+              <span><strong style={{ color: '#fff' }}>{filteredMatches.length.toLocaleString()}</strong> Price Comparisons</span>
+            )}
             <span><strong style={{ color: '#fff' }}>{stats.totalStores}</strong> Stores</span>
             <span><strong style={{ color: '#16a34a' }}>{stats.discountedCount}</strong> On Sale</span>
           </div>
@@ -641,95 +645,121 @@ export default function Home() {
               }}>
                 {paginatedProducts.map((p, idx) => {
                   const discount = getDiscountInfo(p.url);
+                  const affiliateUrl = getAffiliateUrl(p.url);
                   return (
-                    <Link
+                    <div
                       key={idx}
-                      href={`/product/${generateSlug(p.title)}`}
                       style={{
                         background: '#fff',
                         borderRadius: 12,
                         overflow: 'hidden',
                         border: '1px solid #e5e7eb',
-                        textDecoration: 'none',
-                        color: 'inherit',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        flexDirection: 'column'
                       }}
                     >
-                      <div style={{ position: 'relative' }}>
-                        {p.image && (
-                          <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
-                            <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
-                          </div>
-                        )}
-                        {discount && (
-                          <div style={{
-                            position: 'absolute',
-                            top: 8,
-                            left: 8,
-                            background: '#16a34a',
-                            color: '#fff',
-                            padding: '4px 10px',
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 700
-                          }}>
-                            {discount.percent}% OFF
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ padding: 14 }}>
-                        <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
-                          <span>{p.source}</span>
-                          {p.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
-                            <span key={m} style={{ color: '#9ca3af' }}>{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
-                          ))}
-                        </div>
-                        <h3 style={{
-                          fontSize: 14,
-                          fontWeight: 500,
-                          color: '#111',
-                          marginBottom: 10,
-                          lineHeight: 1.4,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          minHeight: 40
-                        }}>
-                          {p.title}
-                        </h3>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                          {discount ? (
-                            <>
-                              <span style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
-                                ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
-                              </span>
-                              <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through' }}>
-                                ${p.price.toFixed(0)}
-                              </span>
-                            </>
-                          ) : (
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>${p.price.toFixed(0)}</span>
+                      <Link
+                        href={`/product/${generateSlug(p.title)}`}
+                        style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          {p.image && (
+                            <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
+                              <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                            </div>
+                          )}
+                          {discount && (
+                            <div style={{
+                              position: 'absolute',
+                              top: 8,
+                              left: 8,
+                              background: '#16a34a',
+                              color: '#fff',
+                              padding: '4px 10px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 700
+                            }}>
+                              {discount.percent}% OFF
+                            </div>
                           )}
                         </div>
-                        {discount && (
-                          <div style={{
-                            marginTop: 8,
-                            padding: '6px 10px',
-                            background: '#f0fdf4',
-                            borderRadius: 6,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                          }}>
-                            <span style={{ fontSize: 11, color: '#16a34a' }}>Use code:</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>
-                              {discount.code}
-                            </span>
+                        <div style={{ padding: 14 }}>
+                          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+                            <span>{p.source}</span>
+                            {p.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
+                              <span key={m} style={{ color: '#9ca3af' }}>{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
+                            ))}
                           </div>
-                        )}
+                          <h3 style={{
+                            fontSize: 14,
+                            fontWeight: 500,
+                            color: '#111',
+                            marginBottom: 10,
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            minHeight: 40
+                          }}>
+                            {p.title}
+                          </h3>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                            {discount ? (
+                              <>
+                                <span style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
+                                  ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
+                                </span>
+                                <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through' }}>
+                                  ${p.price.toFixed(0)}
+                                </span>
+                              </>
+                            ) : (
+                              <span style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>${p.price.toFixed(0)}</span>
+                            )}
+                          </div>
+                          {discount && (
+                            <div style={{
+                              marginTop: 8,
+                              padding: '6px 10px',
+                              background: '#f0fdf4',
+                              borderRadius: 6,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center'
+                            }}>
+                              <span style={{ fontSize: 11, color: '#16a34a' }}>Use code:</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>
+                                {discount.code}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                      <div style={{ padding: '0 14px 14px' }}>
+                        <a
+                          href={affiliateUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '10px',
+                            background: '#E82127',
+                            color: '#fff',
+                            borderRadius: 8,
+                            fontSize: 13,
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            textAlign: 'center'
+                          }}
+                        >
+                          Visit {p.source} →
+                        </a>
                       </div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -1084,7 +1114,7 @@ export default function Home() {
                 const affiliateUrl = getAffiliateUrl(p.url);
 
                 return (
-                  <a key={i} href={affiliateUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', gap: 14, padding: '14px 16px', background: i === 0 ? '#f0fdf4' : '#f9fafb', borderRadius: 10, marginBottom: 10, textDecoration: 'none', color: 'inherit', border: i === 0 ? '2px solid #86efac' : '1px solid #e5e7eb' }}>
+                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', background: i === 0 ? '#f0fdf4' : '#f9fafb', borderRadius: 10, marginBottom: 10, border: i === 0 ? '2px solid #86efac' : '1px solid #e5e7eb', alignItems: 'center' }}>
                     {p.image && (
                       <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#fff', border: '1px solid #e5e7eb' }}>
                         <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1109,7 +1139,25 @@ export default function Home() {
                         </div>
                       )}
                     </div>
-                  </a>
+                    <a
+                      href={affiliateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '10px 20px',
+                        background: i === 0 ? '#16a34a' : '#E82127',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      Visit →
+                    </a>
+                  </div>
                 );
               })}
             </div>

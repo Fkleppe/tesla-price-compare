@@ -14,7 +14,7 @@ import { Product } from '@/lib/types';
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const dataPath = path.join(process.cwd(), '..', 'data', 'latest.json');
+    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     return JSON.parse(data);
   } catch {

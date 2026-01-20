@@ -9,10 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/', '/private/'],
       },
-      {
-        userAgent: 'GPTBot',
-        disallow: '/',
-      },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

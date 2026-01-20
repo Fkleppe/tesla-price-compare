@@ -48,6 +48,7 @@ export default function Footer() {
             <ul className="footer-links">
               <li><Link href="/top-10">Top 10 Lists</Link></li>
               <li><Link href="/stores">Partner Stores</Link></li>
+              <li><Link href="/about">About Us</Link></li>
             </ul>
           </div>
 
