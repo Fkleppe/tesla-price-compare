@@ -200,7 +200,7 @@ export default function Header({
           gap: 6px;
           background: none;
           border: none;
-          color: #a3a3a3;
+          color: #d1d5db;
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
@@ -219,7 +219,7 @@ export default function Header({
           color: #fbbf24;
         }
         .nav-link {
-          color: #a3a3a3;
+          color: #d1d5db;
           text-decoration: none;
           font-size: 13px;
           font-weight: 500;
@@ -288,7 +288,7 @@ export default function Header({
           display: flex;
           gap: 24px;
           font-size: 13px;
-          color: #a3a3a3;
+          color: #d1d5db;
         }
         .header-stats strong {
           color: #fff;
