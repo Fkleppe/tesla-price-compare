@@ -40,12 +40,63 @@ const MODEL_COLORS: Record<string, string> = {
   'cybertruck': 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
 };
 
+// Generate ItemList JSON-LD for models
+function generateModelsJsonLd() {
+  const models = TESLA_MODELS.filter(m => m.id !== 'universal');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Tesla Model Accessory Collections',
+    description: 'Browse Tesla accessories by vehicle model',
+    numberOfItems: models.length,
+    itemListElement: models.map((model, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: `Tesla ${model.name} Accessories`,
+      url: `${SITE_URL}/model/${model.id}`,
+    })),
+  };
+}
+
+// Generate BreadcrumbList JSON-LD
+function generateBreadcrumbJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tesla Models',
+        item: `${SITE_URL}/model`,
+      },
+    ],
+  };
+}
+
 export default function ModelsPage() {
   const models = TESLA_MODELS.filter(m => m.id !== 'universal');
+  const modelsJsonLd = generateModelsJsonLd();
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd();
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      <Header />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(modelsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        <Header />
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         <Breadcrumbs
@@ -156,6 +207,7 @@ export default function ModelsPage() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </>
   );
 }

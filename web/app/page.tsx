@@ -331,7 +331,7 @@ export default function Home() {
                   {TOP_10_CATEGORIES.map(cat => (
                     <Link
                       key={cat.id}
-                      href={`/top-10?list=${cat.id}`}
+                      href={`/top-10/${cat.id}`}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -871,10 +871,123 @@ export default function Home() {
         </main>
       </div>
 
+      {/* SEO Content Section */}
+      <section style={{ background: '#fff', padding: '64px 24px', borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111', marginBottom: 16, textAlign: 'center' }}>
+            Compare Tesla Accessory Prices in 2025
+          </h1>
+          <p style={{ fontSize: 17, color: '#4b5563', lineHeight: 1.8, textAlign: 'center', maxWidth: 800, margin: '0 auto 48px' }}>
+            TeslaCompare helps you find the best deals on Tesla accessories from verified retailers.
+            Compare prices across {stats.totalStores}+ stores, find exclusive discount codes, and save up to 20% on floor mats,
+            screen protectors, charging accessories, and more for Model 3, Model Y, Model S, Model X, and Cybertruck.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 32, marginBottom: 48 }}>
+            <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+                Tesla Model 3 & Highland Accessories
+              </h2>
+              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                Compare floor mats, 9H tempered glass screen protectors, center console wraps, and chargers
+                for Model 3. Highland owners (2024+) can find accessories designed for the refreshed interior.
+              </p>
+              <Link href="/model/model-3" style={{ color: '#E82127', textDecoration: 'none', fontSize: 14, fontWeight: 600, display: 'inline-block', marginTop: 12 }}>
+                Shop Model 3 Accessories →
+              </Link>
+            </div>
+
+            <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+                Tesla Model Y & Juniper Accessories
+              </h2>
+              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                Compare 7-piece floor mat sets, cargo liners, sunshade kits, and camping gear for Model Y.
+                Model Y Juniper 2025+ owners can find accessories made for the refreshed design.
+              </p>
+              <Link href="/model/model-y" style={{ color: '#E82127', textDecoration: 'none', fontSize: 14, fontWeight: 600, display: 'inline-block', marginTop: 12 }}>
+                Shop Model Y Accessories →
+              </Link>
+            </div>
+
+            <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+                Cybertruck Accessories 2024-2025
+              </h2>
+              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                Tesla's revolutionary pickup truck has a growing accessory ecosystem. Find bed liners,
+                floor mats, tonneau covers, frunk organizers, and exterior protection.
+                All accessories are designed specifically for Cybertruck's unique dimensions.
+              </p>
+              <Link href="/model/cybertruck" style={{ color: '#E82127', textDecoration: 'none', fontSize: 14, fontWeight: 600, display: 'inline-block', marginTop: 12 }}>
+                Shop Cybertruck Accessories →
+              </Link>
+            </div>
+          </div>
+
+          <div style={{ background: '#0a0a0a', padding: 40, borderRadius: 16, color: '#fff' }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, textAlign: 'center' }}>
+              Why Compare Tesla Accessory Prices?
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>{stats.totalProducts.toLocaleString()}+</div>
+                <div style={{ fontSize: 14, color: '#9ca3af' }}>Tesla Accessories</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>{stats.totalStores}</div>
+                <div style={{ fontSize: 14, color: '#9ca3af' }}>Verified Stores</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#16a34a', marginBottom: 8 }}>20%</div>
+                <div style={{ fontSize: 14, color: '#9ca3af' }}>Max Discount</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>7</div>
+                <div style={{ fontSize: 14, color: '#9ca3af' }}>Tesla Models</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 48 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: '#111', marginBottom: 24 }}>
+              Popular Tesla Accessory Categories
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+              {[
+                { name: 'Floor Mats', slug: 'floor-mats', desc: 'All-weather TPE protection' },
+                { name: 'Screen Protectors', slug: 'screen-protector', desc: '9H tempered glass' },
+                { name: 'Charging', slug: 'charging', desc: 'Home & portable chargers' },
+                { name: 'Sunshades', slug: 'sunshade', desc: 'UV protection & cooling' },
+                { name: 'Wheel Covers', slug: 'wheel-covers', desc: 'Aero efficiency & style' },
+                { name: 'Storage', slug: 'storage', desc: 'Organizers & solutions' },
+              ].map(cat => (
+                <Link
+                  key={cat.slug}
+                  href={`/category/${cat.slug}`}
+                  style={{
+                    display: 'block',
+                    padding: '20px',
+                    background: '#f9fafb',
+                    borderRadius: 12,
+                    textDecoration: 'none',
+                    border: '1px solid #e5e7eb',
+                    transition: 'border-color 0.2s'
+                  }}
+                >
+                  <div style={{ fontSize: 16, fontWeight: 600, color: '#111', marginBottom: 4 }}>{cat.name}</div>
+                  <div style={{ fontSize: 13, color: '#6b7280' }}>{cat.desc}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer style={{ background: '#0a0a0a', color: '#9ca3af', padding: '48px 24px', marginTop: 48 }}>
+      <footer style={{ background: '#0a0a0a', color: '#9ca3af', padding: '48px 24px' }}>
         <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, marginBottom: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, marginBottom: 32 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 16 }}>
                 Tesla<span style={{ color: '#E82127' }}>Compare</span>
@@ -886,8 +999,8 @@ export default function Home() {
             <div>
               <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 12 }}>Tesla Models</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {['Model 3', 'Model 3 Highland', 'Model Y', 'Model S', 'Model X', 'Cybertruck'].map(m => (
-                  <span key={m} style={{ fontSize: 13, cursor: 'pointer' }} onClick={() => { toggleModel(m.toLowerCase().replace(' ', '-')); window.scrollTo(0,0); }}>{m}</span>
+                {['Model 3', 'Model 3 Highland', 'Model Y', 'Model Y Juniper', 'Model S', 'Model X', 'Cybertruck'].map(m => (
+                  <Link key={m} href={`/model/${m.toLowerCase().replace(/ /g, '-')}`} style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>{m}</Link>
                 ))}
               </div>
             </div>
@@ -895,21 +1008,49 @@ export default function Home() {
               <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 12 }}>Categories</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {['Floor Mats', 'Screen Protectors', 'Charging', 'Interior', 'Exterior'].map(c => (
-                  <span key={c} style={{ fontSize: 13, cursor: 'pointer' }} onClick={() => { toggleCategory(c.toLowerCase().replace(' ', '-')); window.scrollTo(0,0); }}>{c}</span>
+                  <Link key={c} href={`/category/${c.toLowerCase().replace(/ /g, '-')}`} style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>{c}</Link>
                 ))}
               </div>
             </div>
             <div>
               <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 12 }}>Partner Stores</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {['Tesery', 'Yeslak', 'Jowua', 'Hansshow'].map(s => (
+                {['Tesery', 'Tesmanian', 'Yeslak', 'Jowua', 'Hansshow'].map(s => (
                   <span key={s} style={{ fontSize: 13 }}>{s}</span>
                 ))}
               </div>
             </div>
+            <div>
+              <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 12 }}>Contact Us</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
+                Questions or partnership inquiries? Get in touch.
+              </p>
+              <button
+                onClick={(e) => {
+                  const btn = e.currentTarget;
+                  btn.innerHTML = '<a href="mailto:kontakt@statika-as.com" style="color:#E82127;text-decoration:none;">kontakt@statika-as.com</a>';
+                  btn.style.background = 'rgba(232,33,39,0.1)';
+                  btn.style.cursor = 'default';
+                }}
+                style={{
+                  fontSize: 13,
+                  color: '#fff',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  padding: '8px 14px',
+                  borderRadius: 6,
+                  cursor: 'pointer'
+                }}
+              >
+                Show Email
+              </button>
+              <p style={{ fontSize: 11, color: '#6b7280', marginTop: 12 }}>
+                Operated by Statika AS, Norway
+              </p>
+            </div>
           </div>
           <div style={{ borderTop: '1px solid #333', paddingTop: 24, textAlign: 'center' }}>
-            <p style={{ fontSize: 12 }}>© 2025 TeslaCompare. Not affiliated with Tesla, Inc.</p>
+            <p style={{ fontSize: 12 }}>© 2025 TeslaCompare by Statika AS. Not affiliated with Tesla, Inc.</p>
           </div>
         </div>
       </footer>

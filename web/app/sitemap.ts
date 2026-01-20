@@ -74,12 +74,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Top 10 list pages
+  // Top 10 list pages (clean URLs)
   const top10Pages: MetadataRoute.Sitemap = TOP_10_LISTS.map(list => ({
-    url: `${baseUrl}/top-10?list=${list.id}`,
+    url: `${baseUrl}/top-10/${list.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: 0.7,
+    priority: 0.85,
   }));
 
   // Product pages (limit to first 5000 for sitemap size)

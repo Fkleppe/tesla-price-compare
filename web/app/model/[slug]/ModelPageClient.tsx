@@ -22,10 +22,21 @@ interface ModelPageClientProps {
 
 export default function ModelPageClient({ model, initialProducts }: ModelPageClientProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(5000);
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'discount-desc'>('price-asc');
   const [page, setPage] = useState(1);
+
+  // Get available stores for this model
+  const availableStores = useMemo(() => {
+    const modelProducts = initialProducts.filter(p =>
+      isAffiliatePartner(p.url) && p.models?.includes(model.id)
+    );
+    const stores = [...new Set(modelProducts.map(p => p.source))].sort();
+    return stores;
+  }, [initialProducts, model.id]);
 
   const filteredProducts = useMemo(() => {
     let filtered = initialProducts.filter(p =>
@@ -35,6 +46,14 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
 
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(p => selectedCategories.includes(p.category));
+    }
+
+    if (selectedStores.length > 0) {
+      filtered = filtered.filter(p => selectedStores.includes(p.source));
+    }
+
+    if (onSaleOnly) {
+      filtered = filtered.filter(p => getDiscountInfo(p.url) !== null);
     }
 
     filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
@@ -56,7 +75,7 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
     }
 
     return filtered;
-  }, [initialProducts, model.id, selectedCategories, priceMin, priceMax, sortBy]);
+  }, [initialProducts, model.id, selectedCategories, selectedStores, onSaleOnly, priceMin, priceMax, sortBy]);
 
   const paginatedProducts = filteredProducts.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -74,6 +93,13 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
       discountedCount: discounted.length,
     };
   }, [initialProducts]);
+
+  const toggleStore = (store: string) => {
+    setSelectedStores(prev =>
+      prev.includes(store) ? prev.filter(s => s !== store) : [...prev, store]
+    );
+    setPage(1);
+  };
 
   // Get available categories for this model
   const availableCategories = useMemo(() => {
@@ -172,16 +198,30 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
               background: '#fff',
               borderRadius: 12,
               border: '1px solid #e5e7eb',
-              overflow: 'hidden',
               position: 'sticky',
               top: 80,
+              maxHeight: 'calc(100vh - 100px)',
+              overflowY: 'auto',
             }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#111' }}>Filter Results</span>
               </div>
 
+              {/* On Sale Only Toggle */}
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={onSaleOnly}
+                    onChange={() => { setOnSaleOnly(!onSaleOnly); setPage(1); }}
+                    style={{ width: 16, height: 16, accentColor: '#16a34a' }}
+                  />
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#16a34a' }}>On Sale Only</span>
+                </label>
+              </div>
+
               {/* Categories */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', maxHeight: 300, overflowY: 'auto' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Category</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {availableCategories.map(cat => (
@@ -197,6 +237,26 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
                   ))}
                 </div>
               </div>
+
+              {/* Store Filter */}
+              {availableStores.length > 1 && (
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Store</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {availableStores.map(store => (
+                      <label key={store} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedStores.includes(store)}
+                          onChange={() => toggleStore(store)}
+                          style={{ width: 16, height: 16, accentColor: '#E82127' }}
+                        />
+                        <span style={{ fontSize: 13, color: '#374151' }}>{store}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Price Range */}
               <div style={{ padding: '16px 20px' }}>
@@ -371,9 +431,8 @@ export default function ModelPageClient({ model, initialProducts }: ModelPageCli
               </h2>
               <div style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
                 <p style={{ marginBottom: 16 }}>
-                  Upgrade your Tesla {model.name} with our curated selection of premium accessories.
-                  From protective floor mats to advanced charging solutions, we've gathered the best
-                  products from trusted retailers to help you customize and protect your vehicle.
+                  We compare Tesla {model.name} accessories from multiple stores. Floor mats, screen protectors,
+                  chargers, and more. All products listed are verified compatible with your {model.name}.
                 </p>
                 <p style={{ marginBottom: 16 }}>
                   Every product listed is compatible with your {model.name}, so you can shop with confidence.

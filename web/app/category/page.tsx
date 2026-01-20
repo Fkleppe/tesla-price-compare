@@ -20,10 +20,62 @@ export const metadata: Metadata = {
   },
 };
 
+// Generate ItemList JSON-LD for categories
+function generateCategoriesJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Tesla Accessory Categories',
+    description: 'Browse Tesla accessories by category',
+    numberOfItems: CATEGORIES.length,
+    itemListElement: CATEGORIES.map((category, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: category.name,
+      description: category.description,
+      url: `${SITE_URL}/category/${category.id}`,
+    })),
+  };
+}
+
+// Generate BreadcrumbList JSON-LD
+function generateBreadcrumbJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Categories',
+        item: `${SITE_URL}/category`,
+      },
+    ],
+  };
+}
+
 export default function CategoriesPage() {
+  const categoriesJsonLd = generateCategoriesJsonLd();
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd();
+
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      <Header />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoriesJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        <Header />
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         <Breadcrumbs
@@ -46,8 +98,8 @@ export default function CategoriesPage() {
             Shop by Category
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
-            Find the perfect accessories for your Tesla. Browse our curated categories to discover
-            floor mats, screen protectors, charging gear, and more.
+            Find accessories for your Tesla. Browse categories to compare floor mats, screen protectors,
+            chargers, and more from multiple stores.
           </p>
         </section>
 
@@ -97,6 +149,7 @@ export default function CategoriesPage() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </>
   );
 }

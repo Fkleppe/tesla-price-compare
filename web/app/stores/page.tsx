@@ -21,10 +21,70 @@ export const metadata: Metadata = {
   },
 };
 
+// Generate ItemList JSON-LD for stores
+function generateStoresJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Tesla Accessory Partner Stores',
+    description: 'Verified Tesla accessory retailers with exclusive discount codes',
+    numberOfItems: AFFILIATE_PARTNERS.length,
+    itemListElement: AFFILIATE_PARTNERS.map((partner, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Organization',
+        name: partner.name,
+        url: `https://${partner.domains[0]}`,
+        ...(partner.discountCode && {
+          potentialAction: {
+            '@type': 'UseAction',
+            name: `Use discount code ${partner.discountCode} for ${partner.discountPercent}% off`,
+          },
+        }),
+      },
+    })),
+  };
+}
+
+// Generate BreadcrumbList JSON-LD
+function generateBreadcrumbJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Partner Stores',
+        item: `${SITE_URL}/stores`,
+      },
+    ],
+  };
+}
+
 export default function StoresPage() {
+  const storesJsonLd = generateStoresJsonLd();
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd();
+
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      <Header />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storesJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        <Header />
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         <Breadcrumbs
@@ -220,7 +280,7 @@ export default function StoresPage() {
                 Verified Retailers
               </h3>
               <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
-                All our partners are vetted for quality products, reliable shipping, and excellent customer service.
+                These stores specialize in Tesla accessories and have established return policies and customer support.
               </p>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -249,6 +309,7 @@ export default function StoresPage() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </>
   );
 }

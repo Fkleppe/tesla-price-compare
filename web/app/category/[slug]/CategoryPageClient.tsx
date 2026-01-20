@@ -22,10 +22,21 @@ interface CategoryPageClientProps {
 
 export default function CategoryPageClient({ category, initialProducts }: CategoryPageClientProps) {
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(5000);
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'discount-desc'>('price-asc');
   const [page, setPage] = useState(1);
+
+  // Get available stores for this category
+  const availableStores = useMemo(() => {
+    const categoryProducts = initialProducts.filter(p =>
+      isAffiliatePartner(p.url) && p.category === category.id
+    );
+    const stores = [...new Set(categoryProducts.map(p => p.source))].sort();
+    return stores;
+  }, [initialProducts, category.id]);
 
   const filteredProducts = useMemo(() => {
     let filtered = initialProducts.filter(p =>
@@ -35,6 +46,14 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
 
     if (selectedModels.length > 0) {
       filtered = filtered.filter(p => p.models?.some(m => selectedModels.includes(m)));
+    }
+
+    if (selectedStores.length > 0) {
+      filtered = filtered.filter(p => selectedStores.includes(p.source));
+    }
+
+    if (onSaleOnly) {
+      filtered = filtered.filter(p => getDiscountInfo(p.url) !== null);
     }
 
     filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
@@ -56,7 +75,7 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
     }
 
     return filtered;
-  }, [initialProducts, category.id, selectedModels, priceMin, priceMax, sortBy]);
+  }, [initialProducts, category.id, selectedModels, selectedStores, onSaleOnly, priceMin, priceMax, sortBy]);
 
   const paginatedProducts = filteredProducts.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -78,6 +97,13 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
   const toggleModel = (model: string) => {
     setSelectedModels(prev =>
       prev.includes(model) ? prev.filter(m => m !== model) : [...prev, model]
+    );
+    setPage(1);
+  };
+
+  const toggleStore = (store: string) => {
+    setSelectedStores(prev =>
+      prev.includes(store) ? prev.filter(s => s !== store) : [...prev, store]
     );
     setPage(1);
   };
@@ -133,12 +159,26 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
               background: '#fff',
               borderRadius: 12,
               border: '1px solid #e5e7eb',
-              overflow: 'hidden',
               position: 'sticky',
               top: 80,
+              maxHeight: 'calc(100vh - 100px)',
+              overflowY: 'auto',
             }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#111' }}>Filter Results</span>
+              </div>
+
+              {/* On Sale Only Toggle */}
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={onSaleOnly}
+                    onChange={() => { setOnSaleOnly(!onSaleOnly); setPage(1); }}
+                    style={{ width: 16, height: 16, accentColor: '#16a34a' }}
+                  />
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#16a34a' }}>On Sale Only</span>
+                </label>
               </div>
 
               {/* Tesla Models */}
@@ -158,6 +198,26 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
                   ))}
                 </div>
               </div>
+
+              {/* Store Filter */}
+              {availableStores.length > 1 && (
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Store</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {availableStores.map(store => (
+                      <label key={store} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedStores.includes(store)}
+                          onChange={() => toggleStore(store)}
+                          style={{ width: 16, height: 16, accentColor: '#E82127' }}
+                        />
+                        <span style={{ fontSize: 13, color: '#374151' }}>{store}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Price Range */}
               <div style={{ padding: '16px 20px' }}>
@@ -365,7 +425,7 @@ export default function CategoryPageClient({ category, initialProducts }: Catego
               <div style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
                 <p style={{ marginBottom: 16 }}>
                   {category.description}. Whether you own a Model 3, Model Y, Model S, Model X, or Cybertruck,
-                  we've curated the best {category.name.toLowerCase()} from trusted retailers.
+                  we compare {category.name.toLowerCase()} from multiple stores so you can find what fits your car and budget.
                 </p>
                 <p style={{ marginBottom: 16 }}>
                   Our price comparison tool helps you find the lowest prices across multiple stores,

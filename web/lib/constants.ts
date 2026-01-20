@@ -20,18 +20,24 @@ export const MODEL_LABELS: Record<string, string> = Object.fromEntries(
 );
 
 export const CATEGORIES = [
-  { id: 'floor-mats', name: 'Floor Mats', description: 'All-weather and carpet floor mats for Tesla vehicles' },
-  { id: 'screen-protector', name: 'Screen Protectors', description: 'Tempered glass and film screen protectors for Tesla touchscreens' },
-  { id: 'center-console', name: 'Center Console', description: 'Center console wraps, organizers, and accessories' },
-  { id: 'charging', name: 'Charging', description: 'Charging cables, adapters, and wall connectors' },
-  { id: 'exterior', name: 'Exterior', description: 'Exterior accessories including wheel covers, mud flaps, and more' },
-  { id: 'interior', name: 'Interior', description: 'Interior accessories for comfort and style' },
-  { id: 'lighting', name: 'Lighting', description: 'LED upgrades and ambient lighting' },
-  { id: 'storage', name: 'Storage', description: 'Trunk organizers, frunk mats, and storage solutions' },
-  { id: 'camping', name: 'Camping', description: 'Camping gear including mattresses and tents' },
-  { id: 'sunshade', name: 'Sunshades', description: 'Windshield and window sunshades' },
-  { id: 'seat-covers', name: 'Seat Covers', description: 'Seat covers and protectors' },
-  { id: 'electronics', name: 'Electronics', description: 'Phone mounts, dashcams, and electronic accessories' },
+  { id: 'floor-mats', name: 'Floor Mats', description: 'All-weather TPE and carpet floor mats for Tesla vehicles' },
+  { id: 'cargo-mats', name: 'Cargo Mats', description: 'Trunk liners and cargo area protection for Tesla' },
+  { id: 'screen-protector', name: 'Screen Protectors', description: '9H tempered glass screen protectors for Tesla touchscreens' },
+  { id: 'center-console', name: 'Center Console', description: 'Center console wraps, organizers, and protective covers' },
+  { id: 'charging', name: 'Charging', description: 'Home chargers, mobile connectors, and charging adapters' },
+  { id: 'exterior', name: 'Exterior', description: 'Spoilers, mud flaps, and exterior styling accessories' },
+  { id: 'interior', name: 'Interior', description: 'Interior upgrades for comfort, style, and protection' },
+  { id: 'interior-trim', name: 'Interior Trim', description: 'Carbon fiber and premium trim pieces for Tesla interiors' },
+  { id: 'wheel-covers', name: 'Wheel Covers', description: 'Aero wheel covers and hub caps for improved range' },
+  { id: 'lighting', name: 'Lighting', description: 'LED upgrades, puddle lights, and ambient lighting' },
+  { id: 'storage', name: 'Storage', description: 'Under-seat storage, organizers, and space solutions' },
+  { id: 'camping', name: 'Camping', description: 'Camping mattresses, tents, and outdoor gear for Tesla' },
+  { id: 'sunshade', name: 'Sunshades', description: 'Windshield and panoramic roof sunshades' },
+  { id: 'seat-covers', name: 'Seat Covers', description: 'Custom-fit seat covers and protectors' },
+  { id: 'electronics', name: 'Electronics', description: 'Phone mounts, wireless chargers, and dash cameras' },
+  { id: 'spoiler', name: 'Spoilers', description: 'Performance spoilers and rear wings for Tesla' },
+  { id: 'phone-mount', name: 'Phone Mounts', description: 'Magnetic and wireless charging phone mounts' },
+  { id: 'mud-flaps', name: 'Mud Flaps', description: 'Paint protection mud flaps and splash guards' },
 ] as const;
 
 export const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(

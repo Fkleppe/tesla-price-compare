@@ -114,7 +114,7 @@ export default function Header({
                   {TOP_10_LISTS.map(list => (
                     <Link
                       key={list.id}
-                      href={`/top-10?list=${list.id}`}
+                      href={`/top-10/${list.id}`}
                       className="dropdown-item"
                     >
                       {list.title.replace('Best ', '')}

@@ -33,11 +33,6 @@ export function ProductJsonLd({ product, discountPercent }: ProductJsonLdProps) 
         name: product.source,
       },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.5',
-      reviewCount: Math.floor(Math.random() * 200) + 50,
-    },
   };
 
   return (
@@ -54,7 +49,7 @@ export function OrganizationJsonLd() {
     '@type': 'Organization',
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    // logo: `${SITE_URL}/logo.png`, // TODO: Add logo.png to /public
     description: 'Compare prices on Tesla accessories across multiple stores. Find the best deals with exclusive discount codes.',
     sameAs: [],
   };
@@ -73,14 +68,7 @@ export function WebSiteJsonLd() {
     '@type': 'WebSite',
     name: SITE_NAME,
     url: SITE_URL,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/?search={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
+    // Note: SearchAction removed - site uses client-side filtering, not URL-based search
   };
 
   return (

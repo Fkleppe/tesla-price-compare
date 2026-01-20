@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { TESLA_MODELS, CATEGORIES, SITE_NAME } from '@/lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [showEmail, setShowEmail] = useState(false);
 
   return (
     <footer className="footer">
@@ -16,6 +18,9 @@ export default function Footer() {
             </Link>
             <p className="footer-desc">
               Find the best deals on Tesla accessories with exclusive discount codes from verified retailers.
+            </p>
+            <p className="footer-company">
+              Operated by Statika AS, Norway
             </p>
           </div>
 
@@ -46,15 +51,36 @@ export default function Footer() {
             <ul className="footer-links">
               <li><Link href="/top-10">Top 10 Lists</Link></li>
               <li><Link href="/stores">Partner Stores</Link></li>
-              <li><Link href="/deals">Today's Deals</Link></li>
-              <li><Link href="/about">About Us</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
+            </ul>
+          </div>
+
+          <div className="footer-section">
+            <h4 className="footer-title">Contact Us</h4>
+            <ul className="footer-links">
+              <li>
+                {showEmail ? (
+                  <a href="mailto:kontakt@statika-as.com" className="footer-email-revealed">
+                    kontakt@statika-as.com
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setShowEmail(true)}
+                    className="footer-email-button"
+                  >
+                    Show Email
+                  </button>
+                )}
+              </li>
+              <li style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>
+                Statika AS<br />
+                Norway
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {currentYear} {SITE_NAME}. Not affiliated with Tesla, Inc.</p>
+          <p>&copy; {currentYear} Statika AS / {SITE_NAME}. Not affiliated with Tesla, Inc.</p>
           <div className="footer-legal">
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms of Service</Link>
@@ -75,12 +101,17 @@ export default function Footer() {
         }
         .footer-grid {
           display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
-          gap: 48px;
+          grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+          gap: 40px;
           margin-bottom: 48px;
         }
         .footer-brand {
-          max-width: 280px;
+          max-width: 240px;
+        }
+        .footer-company {
+          font-size: 12px;
+          color: #6b7280;
+          margin-top: 12px;
         }
         .footer-logo {
           color: #fff;
@@ -122,6 +153,32 @@ export default function Footer() {
         .footer-links a:hover {
           color: #fff;
         }
+        .footer-email-button {
+          background: rgba(232, 33, 39, 0.1);
+          border: 1px solid rgba(232, 33, 39, 0.3);
+          color: #E82127;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .footer-email-button:hover {
+          background: rgba(232, 33, 39, 0.2);
+          border-color: #E82127;
+        }
+        .footer-email-revealed {
+          color: #E82127;
+          text-decoration: none;
+          font-size: 13px;
+          background: rgba(232, 33, 39, 0.1);
+          padding: 8px 12px;
+          border-radius: 6px;
+          display: inline-block;
+        }
+        .footer-email-revealed:hover {
+          background: rgba(232, 33, 39, 0.2);
+        }
         .footer-bottom {
           border-top: 1px solid #262626;
           padding-top: 24px;
@@ -146,14 +203,20 @@ export default function Footer() {
         .footer-legal a:hover {
           color: #fff;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
           .footer-grid {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 32px;
           }
           .footer-brand {
             grid-column: 1 / -1;
             max-width: 100%;
+          }
+        }
+        @media (max-width: 600px) {
+          .footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
           }
           .footer-bottom {
             flex-direction: column;
