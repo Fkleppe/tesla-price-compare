@@ -5,8 +5,8 @@ import path from 'path';
 export async function GET() {
   try {
     // Try AI matches first (higher quality), then fall back to regular matches
-    const aiMatchesPath = path.join(process.cwd(), '..', 'data', 'ai-matches.json');
-    const regularMatchesPath = path.join(process.cwd(), '..', 'data', 'matches.json');
+    const aiMatchesPath = path.join(process.cwd(), 'data', 'ai-matches.json');
+    const regularMatchesPath = path.join(process.cwd(), 'data', 'matches.json');
 
     let matches = [];
 

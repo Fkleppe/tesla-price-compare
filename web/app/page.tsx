@@ -273,7 +273,7 @@ export default function Home() {
         <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
             <Link href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 20, fontWeight: 700 }}>
-              Tesla<span style={{ color: '#E82127' }}>Compare</span>
+              EV<span style={{ color: '#E82127' }}>PriceHunt</span>
             </Link>
             {/* Top 10 Dropdown */}
             <div

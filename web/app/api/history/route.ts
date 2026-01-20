@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET() {
   try {
-    const historyPath = path.join(process.cwd(), '..', 'data', 'price-history.json');
+    const historyPath = path.join(process.cwd(), 'data', 'price-history.json');
     const data = await fs.readFile(historyPath, 'utf-8');
     const history = JSON.parse(data);
     return NextResponse.json(history);

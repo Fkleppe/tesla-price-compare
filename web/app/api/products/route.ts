@@ -5,7 +5,7 @@ import { isAffiliatePartner } from '../../../lib/affiliate';
 
 export async function GET() {
   try {
-    const dataPath = path.join(process.cwd(), '..', 'data', 'latest.json');
+    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     const allProducts = JSON.parse(data);
     // Filter out products under $10 and non-affiliate partners

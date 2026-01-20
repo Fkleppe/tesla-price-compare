@@ -646,7 +646,7 @@ export default function ProductPageClient({
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>
-            Tesla<span style={{ color: '#E82127' }}>Compare</span>
+            EV<span style={{ color: '#E82127' }}>PriceHunt</span>
           </Link>
           <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
             <Link href="/" style={{ color: '#a3a3a3', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
@@ -1714,7 +1714,7 @@ export default function ProductPageClient({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, marginBottom: 32 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 16 }}>
-                Tesla<span style={{ color: '#E82127' }}>Compare</span>
+                EV<span style={{ color: '#E82127' }}>PriceHunt</span>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.6 }}>
                 Find the best prices on Tesla accessories from verified retailers with exclusive discount codes.
