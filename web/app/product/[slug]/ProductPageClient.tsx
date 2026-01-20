@@ -1240,12 +1240,12 @@ export default function ProductPageClient({
                   >
                     {discountInfo ? (
                       <>
-                        Get {discountInfo.percent}% Off Now
+                        Visit {product.source} - {discountInfo.percent}% Off
                         <span style={{ fontSize: 18 }}>→</span>
                       </>
                     ) : (
                       <>
-                        Buy Now at {product.source}
+                        Visit {product.source}
                         <span style={{ fontSize: 18 }}>→</span>
                       </>
                     )}

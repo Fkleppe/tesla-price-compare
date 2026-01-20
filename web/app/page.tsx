@@ -466,7 +466,7 @@ export default function Home() {
         {/* Sidebar Filters */}
         {showFilters && (
           <aside style={{ width: 280, flexShrink: 0 }}>
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', position: 'sticky', top: 80 }}>
+            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', position: 'sticky', top: 80, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
               {/* Filter Header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#111' }}>Filters</span>
