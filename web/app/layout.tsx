@@ -80,9 +80,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Add verification codes when available
-    // google: "google-site-verification-code",
-    // yandex: "yandex-verification-code",
+    google: "LdrWkgcfA92UjZJTf-fzwCvkeajrd3H5X0cc4HRLLgI",
   },
   alternates: {
     canonical: SITE_URL,
