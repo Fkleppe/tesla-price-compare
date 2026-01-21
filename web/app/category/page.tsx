@@ -8,12 +8,28 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Tesla Accessory Categories | Shop by Category | ${SITE_NAME}`,
   description: 'Browse Tesla accessories by category. Find floor mats, screen protectors, charging accessories, sunshades, and more for your Model 3, Model Y, Model S, Model X, or Cybertruck.',
+  keywords: [
+    'Tesla accessories categories',
+    'Tesla floor mats',
+    'Tesla screen protector',
+    'Tesla charging accessories',
+    'Tesla sunshade',
+    'Tesla center console',
+    'Tesla interior accessories',
+    'Tesla exterior accessories',
+    'EV accessories',
+  ],
   openGraph: {
     title: `Tesla Accessory Categories | ${SITE_NAME}`,
     description: 'Browse Tesla accessories by category.',
     url: `${SITE_URL}/category`,
     siteName: SITE_NAME,
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Tesla Accessory Categories | ${SITE_NAME}`,
+    description: 'Browse Tesla accessories by category.',
   },
   alternates: {
     canonical: `${SITE_URL}/category`,

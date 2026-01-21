@@ -8,6 +8,18 @@ import { SITE_NAME, SITE_URL } from '@/lib/constants';
 export const metadata: Metadata = {
   title: `Privacy Policy | ${SITE_NAME}`,
   description: 'Privacy policy for EVPriceHunt. Learn how we collect, use, and protect your information.',
+  openGraph: {
+    title: `Privacy Policy | ${SITE_NAME}`,
+    description: 'Privacy policy for EVPriceHunt. Learn how we collect, use, and protect your information.',
+    url: `${SITE_URL}/privacy`,
+    siteName: SITE_NAME,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: `Privacy Policy | ${SITE_NAME}`,
+    description: 'Privacy policy for EVPriceHunt.',
+  },
   alternates: {
     canonical: `${SITE_URL}/privacy`,
   },

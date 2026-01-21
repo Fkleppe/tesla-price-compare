@@ -8,6 +8,18 @@ import { SITE_NAME, SITE_URL } from '@/lib/constants';
 export const metadata: Metadata = {
   title: `Terms of Service | ${SITE_NAME}`,
   description: 'Terms of service for EVPriceHunt. Read our terms and conditions for using our Tesla accessory comparison website.',
+  openGraph: {
+    title: `Terms of Service | ${SITE_NAME}`,
+    description: 'Terms of service for EVPriceHunt. Read our terms and conditions.',
+    url: `${SITE_URL}/terms`,
+    siteName: SITE_NAME,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: `Terms of Service | ${SITE_NAME}`,
+    description: 'Terms of service for EVPriceHunt.',
+  },
   alternates: {
     canonical: `${SITE_URL}/terms`,
   },

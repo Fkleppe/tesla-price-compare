@@ -49,7 +49,7 @@ export function OrganizationJsonLd() {
     '@type': 'Organization',
     name: SITE_NAME,
     url: SITE_URL,
-    // logo: `${SITE_URL}/logo.png`, // TODO: Add logo.png to /public
+    logo: `${SITE_URL}/icon.svg`,
     description: 'Compare prices on Tesla accessories across multiple stores. Find the best deals with exclusive discount codes.',
     sameAs: [],
   };

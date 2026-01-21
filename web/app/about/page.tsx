@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: `About ${SITE_NAME}`,
+    description: 'Compare Tesla accessory prices and find exclusive discount codes.',
+  },
   alternates: {
     canonical: `${SITE_URL}/about`,
   },

@@ -29,7 +29,7 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     price: 899,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#snuuzu',
-    image: 'https://www.snuuzu.com/cdn/shop/files/MY_black_3.jpg?v=1731661468&width=800',
+    image: 'https://www.snuuzu.com/cdn/shop/files/4eyes-240304-snuuzu-back_of_car-2000px-11.jpg?v=1764936821&width=800',
     source: 'Snuuzu',
     sourceId: 'snuuzu',
     category: 'camping',
@@ -41,7 +41,7 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     price: 899,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#snuuzu',
-    image: 'https://www.snuuzu.com/cdn/shop/files/M3_black_4.jpg?v=1731661582&width=800',
+    image: 'https://www.snuuzu.com/cdn/shop/files/4eyes-240314-snuuzu-side_angle-2000px-2.jpg?v=1764085843&width=800',
     source: 'Snuuzu',
     sourceId: 'snuuzu',
     category: 'camping',
@@ -49,23 +49,11 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     description: 'Premium memory foam mattress designed specifically for Tesla Model 3. Self-inflating with built-in pump.',
   },
   {
-    title: 'Havnby Autolevel Foam Mattress',
-    price: 359.99,
-    currency: 'USD',
-    url: 'https://www.teslamattress.com/#havnby',
-    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-autolevelfoam-4.jpg?v=1734366792&width=800',
-    source: 'Havnby',
-    sourceId: 'havnby',
-    category: 'camping',
-    models: ['model-y', 'model-3'],
-    description: 'Self-leveling foam mattress that adjusts to the trunk slope. No inflation needed.',
-  },
-  {
     title: 'TESMAT Luxe Mattress for Model Y',
     price: 379,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#tesmat',
-    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Model_Y_Lifestyle_01.jpg?v=1687889374&width=800',
+    image: 'https://www.tesmat.com/cdn/shop/files/tesmatluxejoshuatree-xYtk4yu0x-transformed_450x450.jpg?v=1722609736',
     source: 'TESMAT',
     sourceId: 'tesmat',
     category: 'camping',
@@ -73,11 +61,35 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     description: 'Dual-zone memory foam mattress with cooling gel layer. Fits perfectly in Model Y.',
   },
   {
+    title: 'Havnby Autolevel Foam Mattress',
+    price: 359.99,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#havnby',
+    image: 'https://havnby.com/cdn/shop/files/tesla-model-s3xy-foam-mattress-858551.jpg?v=1744391906&width=800',
+    source: 'Havnby',
+    sourceId: 'havnby',
+    category: 'camping',
+    models: ['model-y', 'model-3'],
+    description: 'Self-leveling foam mattress that adjusts to the trunk slope. No inflation needed.',
+  },
+  {
+    title: 'Havnby Tesla Foam Mattress',
+    price: 299,
+    currency: 'USD',
+    url: 'https://www.teslamattress.com/#havnby',
+    image: 'https://havnby.com/cdn/shop/files/tesla-model-s3xy-foam-mattress-758254.jpg?v=1767597003&width=800',
+    source: 'Havnby',
+    sourceId: 'havnby',
+    category: 'camping',
+    models: ['model-y', 'model-3', 'model-s', 'model-x'],
+    description: 'Premium foam mattress for Tesla Model S, 3, X, Y. Designed for maximum comfort.',
+  },
+  {
     title: 'TESMAT Luxe Mattress for Model 3',
     price: 379,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#tesmat',
-    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Model_3_Lifestyle_01.jpg?v=1687889374&width=800',
+    image: 'https://www.tesmat.com/cdn/shop/files/tesmatluxejoshuatree-xYtk4yu0x-transformed_450x450.jpg?v=1722609736',
     source: 'TESMAT',
     sourceId: 'tesmat',
     category: 'camping',
@@ -89,7 +101,7 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     price: 289,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#tesery',
-    image: 'https://www.tesery.com/cdn/shop/files/novapads-camping-mattress-for-tesla-model-y-model-3-660695.jpg?v=1734503477&width=800',
+    image: 'https://havnby.com/cdn/shop/files/tesla-model-s3xy-foam-mattress-684267.jpg?v=1767597003&width=800',
     source: 'Tesery',
     sourceId: 'tesery',
     category: 'camping',
@@ -97,23 +109,11 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     description: 'Budget-friendly memory foam mattress with good support. Great value option.',
   },
   {
-    title: 'Havnby Foam Mattress for Model Y/3',
-    price: 259,
-    currency: 'USD',
-    url: 'https://www.teslamattress.com/#havnby',
-    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-original-10.jpg?v=1731575193&width=800',
-    source: 'Havnby',
-    sourceId: 'havnby',
-    category: 'camping',
-    models: ['model-y', 'model-3'],
-    description: 'Original foam mattress from Havnby. Simple design, comfortable sleep.',
-  },
-  {
-    title: 'Havnby Autolevel Solo Mattress',
+    title: 'Havnby Solo Mattress',
     price: 239.99,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#havnby',
-    image: 'https://havnby.com/cdn/shop/files/TeslaMattress-TeslaCamping-SUVMattress-foammattress-autolevelfoam-solo-4.jpg?v=1734366898&width=800',
+    image: 'https://havnby.com/cdn/shop/files/tesla-solo-mattress-main.jpg?v=1762143732&width=800',
     source: 'Havnby',
     sourceId: 'havnby',
     category: 'camping',
@@ -125,7 +125,7 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     price: 139,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#tesmat',
-    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Solo_Model_Y.jpg?v=1687889374&width=800',
+    image: 'https://www.tesmat.com/cdn/shop/files/explainer_solo_tesmat_bbc9c6eb-78c7-4ebc-85f2-941c61241a7e_450x450.png?v=1713898596',
     source: 'TESMAT',
     sourceId: 'tesmat',
     category: 'camping',
@@ -137,7 +137,7 @@ const CURATED_MATTRESS_PRODUCTS: Product[] = [
     price: 139,
     currency: 'USD',
     url: 'https://www.teslamattress.com/#tesmat',
-    image: 'https://tesmat.com/cdn/shop/files/TESMAT_Solo_Model_3.jpg?v=1687889374&width=800',
+    image: 'https://www.tesmat.com/cdn/shop/files/explainer_solo_tesmat_bbc9c6eb-78c7-4ebc-85f2-941c61241a7e_450x450.png?v=1713898596',
     source: 'TESMAT',
     sourceId: 'tesmat',
     category: 'camping',
@@ -269,7 +269,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
           marginBottom: 32,
           color: '#fff',
         }}>
-          <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
+          <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 12, color: '#ffffff' }}>
             {list.title}
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)', maxWidth: 700, lineHeight: 1.6 }}>
@@ -401,15 +401,22 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
 
                       {/* Image */}
                       <div style={{ width: 220, flexShrink: 0, position: 'relative' }}>
-                        {product.image && (
-                          <div style={{ aspectRatio: '1', background: '#f9fafb' }}>
+                        <div style={{ aspectRatio: '1', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {product.image ? (
                             <img
                               src={product.image}
                               alt={`${product.title} - Rank #${index + 1} in ${list.title}`}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;font-size:14px;text-align:center;padding:20px">Image not available</div>';
+                              }}
                             />
-                          </div>
-                        )}
+                          ) : (
+                            <span style={{ color: '#9ca3af', fontSize: 14 }}>No image</span>
+                          )}
+                        </div>
                         {discount && (
                           <div style={{
                             position: 'absolute',

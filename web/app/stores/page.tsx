@@ -9,12 +9,25 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Partner Stores | Trusted Tesla Accessory Retailers | ${SITE_NAME}`,
   description: 'Shop from our verified partner stores for Tesla accessories. Get exclusive discount codes and compare prices across top retailers.',
+  keywords: [
+    'Tesla accessory stores',
+    'Tesla discount codes',
+    'Tesery discount',
+    'Tesmanian coupon',
+    'Tesla aftermarket retailers',
+    'EV accessory stores',
+  ],
   openGraph: {
     title: `Partner Stores | ${SITE_NAME}`,
     description: 'Trusted Tesla accessory retailers with exclusive discount codes.',
     url: `${SITE_URL}/stores`,
     siteName: SITE_NAME,
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Partner Stores | ${SITE_NAME}`,
+    description: 'Trusted Tesla accessory retailers with exclusive discount codes.',
   },
   alternates: {
     canonical: `${SITE_URL}/stores`,
