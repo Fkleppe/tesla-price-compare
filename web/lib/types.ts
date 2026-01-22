@@ -16,9 +16,12 @@ export interface Product {
 
 export interface ProductMatch {
   matchKey: string;
+  name?: string;
   category: string;
   models: string[];
-  brand: string;
+  brand?: string;
+  matchType?: string;
+  confidence?: string;
   lowestPrice: number;
   highestPrice: number;
   savings: number;

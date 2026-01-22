@@ -1,7 +1,7 @@
 // Centralized constants for the application
 
 export const SITE_NAME = 'EVPriceHunt';
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://evpricehunt.com';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.evpricehunt.com';
 export const SITE_DESCRIPTION = 'Compare prices on Tesla and EV accessories across multiple stores. Find the best deals with exclusive discount codes.';
 
 export const TESLA_MODELS = [
