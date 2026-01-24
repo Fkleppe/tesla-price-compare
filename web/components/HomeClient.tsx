@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAffiliateUrl, getDiscountInfo, isAffiliatePartner } from '../lib/affiliate';
@@ -65,8 +65,9 @@ const ITEMS_PER_PAGE = 48;
 export default function HomeClient({ initialProducts, initialMatches, stats, initialMeta }: HomeClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('products');
   const [selectedMatch, setSelectedMatch] = useState<ProductMatch | null>(null);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [showTop10Menu, setShowTop10Menu] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +79,35 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
   const [onlyDiscounted, setOnlyDiscounted] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [page, setPage] = useState(1);
+
+  // Check for mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Auto-hide filters on mobile
+      if (mobile) {
+        setShowFilters(false);
+      } else {
+        setShowFilters(true);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Prevent body scroll when mobile filter is open
+  useEffect(() => {
+    if (isMobile && showFilters) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobile, showFilters]);
 
   // Build fallback data for SWR
   const fallbackData: PaginatedResponse<Product> = useMemo(() => ({
@@ -182,213 +212,109 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
   const showLoadingState = isLoading || (isValidating && products.length === 0);
 
+  const closeMobileFilters = () => {
+    if (isMobile) {
+      setShowFilters(false);
+    }
+  };
+
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+    <div className="home-container">
       {/* Header */}
-      <header style={{ background: '#0a0a0a', padding: '14px 0', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 20, fontWeight: 700 }}>
-              EV<span style={{ color: '#E82127' }}>PriceHunt</span>
+      <header className="home-header">
+        <div className="header-inner">
+          <div className="header-left">
+            <Link href="/" className="logo">
+              EV<span className="logo-accent">PriceHunt</span>
             </Link>
-            {/* Top 10 Dropdown */}
+            {/* Top 10 Dropdown - Desktop */}
             <div
-              style={{ position: 'relative' }}
+              className="top10-dropdown desktop-only"
               onMouseEnter={() => setShowTop10Menu(true)}
               onMouseLeave={() => setShowTop10Menu(false)}
             >
-              <button
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'none',
-                  border: 'none',
-                  color: '#fbbf24',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  padding: '8px 0'
-                }}
-              >
+              <button className="top10-btn">
                 Top 10 Lists
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {showTop10Menu && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  background: '#fff',
-                  borderRadius: 12,
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-                  minWidth: 260,
-                  padding: '8px 0',
-                  zIndex: 200
-                }}>
-                  <Link
-                    href="/top-10"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: '12px 16px',
-                      color: '#111',
-                      textDecoration: 'none',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      borderBottom: '1px solid #e5e7eb'
-                    }}
-                  >
+                <div className="top10-menu">
+                  <Link href="/top-10" className="top10-item top10-header">
                     All Top 10 Lists
                   </Link>
                   {TOP_10_CATEGORIES.map(cat => (
-                    <Link
-                      key={cat.id}
-                      href={`/top-10/${cat.id}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '10px 16px',
-                        color: '#374151',
-                        textDecoration: 'none',
-                        fontSize: 13,
-                        fontWeight: 500
-                      }}
-                    >
+                    <Link key={cat.id} href={`/top-10/${cat.id}`} className="top10-item">
                       {cat.title}
                     </Link>
                   ))}
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 4, background: '#1f1f1f', borderRadius: 8, padding: 4 }}>
+            <div className="view-toggle">
               <button
                 onClick={() => { setViewMode('products'); setPage(1); }}
-                style={{
-                  padding: '8px 16px', fontSize: 13, fontWeight: 500, borderRadius: 6, border: 'none', cursor: 'pointer',
-                  background: viewMode === 'products' ? '#E82127' : 'transparent',
-                  color: '#fff'
-                }}
+                className={`toggle-btn ${viewMode === 'products' ? 'active' : ''}`}
               >
                 Products
               </button>
               <button
                 onClick={() => setViewMode('comparisons')}
-                style={{
-                  padding: '8px 16px', fontSize: 13, fontWeight: 500, borderRadius: 6, border: 'none', cursor: 'pointer',
-                  background: viewMode === 'comparisons' ? '#E82127' : 'transparent',
-                  color: '#fff'
-                }}
+                className={`toggle-btn ${viewMode === 'comparisons' ? 'active' : ''}`}
               >
-                Compare Prices
+                Compare
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#a3a3a3' }}>
+          <div className="header-stats desktop-only">
             {viewMode === 'products' ? (
-              <span><strong style={{ color: '#fff' }}>{totalProducts.toLocaleString()}</strong> Products</span>
+              <span><strong>{totalProducts.toLocaleString()}</strong> Products</span>
             ) : (
-              <span><strong style={{ color: '#fff' }}>{filteredMatches.length.toLocaleString()}</strong> Price Comparisons</span>
+              <span><strong>{filteredMatches.length.toLocaleString()}</strong> Comparisons</span>
             )}
-            <span><strong style={{ color: '#fff' }}>{stats.totalStores}</strong> Stores</span>
-            <span><strong style={{ color: '#16a34a' }}>{discountedCount}</strong> On Sale</span>
+            <span><strong>{stats.totalStores}</strong> Stores</span>
+            <span className="stat-sale"><strong>{discountedCount}</strong> On Sale</span>
           </div>
         </div>
       </header>
 
       {/* Search Bar */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '16px 0' }}>
-        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <div style={{ position: 'relative', flex: 1, maxWidth: 500 }}>
+      <div className="search-bar">
+        <div className="search-inner">
+          <div className="search-row">
+            <div className="search-input-wrap">
               <input
                 type="text"
                 placeholder="Search Tesla accessories..."
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px 12px 44px',
-                  fontSize: 15,
-                  border: '2px solid #e5e7eb',
-                  borderRadius: 10,
-                  background: '#fff',
-                  outline: 'none'
-                }}
+                className="search-input"
               />
-              <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20, color: '#9ca3af' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              {isValidating && (
-                <div
-                  role="status"
-                  aria-label="Loading products"
-                  style={{
-                    position: 'absolute',
-                    right: 14,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: 16,
-                    height: 16,
-                    border: '2px solid #e5e7eb',
-                    borderTopColor: '#E82127',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite',
-                  }}
-                />
-              )}
+              {isValidating && <div className="search-spinner" role="status" aria-label="Loading" />}
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
               aria-expanded={showFilters}
-              aria-controls="filter-sidebar"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '12px 20px',
-                fontSize: 14,
-                fontWeight: 500,
-                border: '2px solid #e5e7eb',
-                borderRadius: 10,
-                background: showFilters ? '#f3f4f6' : '#fff',
-                cursor: 'pointer'
-              }}
+              className={`filter-btn ${showFilters ? 'active' : ''}`}
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
-              Filters
+              <span className="filter-btn-text">Filters</span>
               {activeFiltersCount > 0 && (
-                <span style={{
-                  background: '#E82127',
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '2px 8px',
-                  borderRadius: 10
-                }}>
-                  {activeFiltersCount}
-                </span>
+                <span className="filter-badge">{activeFiltersCount}</span>
               )}
             </button>
 
             <select
               value={sortBy}
               onChange={e => { setSortBy(e.target.value as SortOption); setPage(1); }}
-              style={{
-                padding: '12px 16px',
-                fontSize: 14,
-                border: '2px solid #e5e7eb',
-                borderRadius: 10,
-                background: '#fff',
-                cursor: 'pointer'
-              }}
+              className="sort-select"
             >
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
@@ -400,60 +326,67 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: 1440, margin: '0 auto', padding: '24px', display: 'flex', gap: 24 }}>
+      <div className="main-content">
+        {/* Mobile Filter Overlay */}
+        {isMobile && showFilters && (
+          <div className="filter-overlay" onClick={() => setShowFilters(false)} />
+        )}
+
         {/* Sidebar Filters */}
         {showFilters && (
-          <aside id="filter-sidebar" style={{ width: 280, flexShrink: 0 }}>
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', position: 'sticky', top: 80, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
+          <aside className={`filter-sidebar ${isMobile ? 'mobile' : ''}`}>
+            <div className="filter-container">
               {/* Filter Header */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#111' }}>Filters</span>
-                {activeFiltersCount > 0 && (
-                  <button onClick={clearFilters} style={{ fontSize: 13, color: '#E82127', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
-                    Clear All
-                  </button>
-                )}
+              <div className="filter-header">
+                <span className="filter-title">Filters</span>
+                <div className="filter-header-actions">
+                  {activeFiltersCount > 0 && (
+                    <button onClick={clearFilters} className="clear-filters-btn">
+                      Clear All
+                    </button>
+                  )}
+                  {isMobile && (
+                    <button onClick={() => setShowFilters(false)} className="close-filters-btn" aria-label="Close filters">
+                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Discount Toggle */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+              <div className="filter-section">
+                <label className="discount-toggle">
                   <input
                     type="checkbox"
                     checked={onlyDiscounted}
                     onChange={e => { setOnlyDiscounted(e.target.checked); setPage(1); }}
-                    style={{ width: 18, height: 18, accentColor: '#16a34a' }}
                   />
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#111' }}>
-                    On Sale Only
-                  </span>
-                  <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600, marginLeft: 'auto' }}>
-                    {discountedCount}
-                  </span>
+                  <span className="discount-label">On Sale Only</span>
+                  <span className="discount-count">{discountedCount}</span>
                 </label>
               </div>
 
               {/* Price Range */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Price Range</div>
-                <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4 }}>Min</label>
+              <div className="filter-section">
+                <div className="filter-section-title">Price Range</div>
+                <div className="price-inputs">
+                  <div className="price-input-group">
+                    <label>Min</label>
                     <input
                       type="number"
                       value={priceMin}
                       onChange={e => { setPriceMin(Number(e.target.value)); setPage(1); }}
-                      style={{ width: '100%', padding: '8px 12px', fontSize: 14, border: '1px solid #e5e7eb', borderRadius: 6 }}
                       min={0}
                     />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4 }}>Max</label>
+                  <div className="price-input-group">
+                    <label>Max</label>
                     <input
                       type="number"
                       value={priceMax}
                       onChange={e => { setPriceMax(Number(e.target.value)); setPage(1); }}
-                      style={{ width: '100%', padding: '8px 12px', fontSize: 14, border: '1px solid #e5e7eb', borderRadius: 6 }}
                       min={0}
                     />
                   </div>
@@ -464,105 +397,113 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                   max={stats.maxPrice || 5000}
                   value={priceMax}
                   onChange={e => { setPriceMax(Number(e.target.value)); setPage(1); }}
-                  style={{ width: '100%', accentColor: '#E82127' }}
+                  className="price-slider"
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6b7280', marginTop: 4 }}>
+                <div className="price-range-labels">
                   <span>$0</span>
                   <span>${stats.maxPrice?.toLocaleString() || '5,000'}</span>
                 </div>
               </div>
 
               {/* Tesla Models */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Tesla Model</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="filter-section">
+                <div className="filter-section-title">Tesla Model</div>
+                <div className="filter-options">
                   {stats.models.map(model => (
-                    <label key={model} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                    <label key={model} className="filter-option">
                       <input
                         type="checkbox"
                         checked={selectedModels.includes(model)}
                         onChange={() => toggleModel(model)}
-                        style={{ width: 16, height: 16, accentColor: '#E82127' }}
                       />
-                      <span style={{ fontSize: 13, color: '#374151' }}>{MODEL_LABELS[model] || model}</span>
+                      <span>{MODEL_LABELS[model] || model}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Categories */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', maxHeight: 250, overflowY: 'auto' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Category</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="filter-section filter-section-scroll">
+                <div className="filter-section-title">Category</div>
+                <div className="filter-options">
                   {stats.categories.map(cat => (
-                    <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                    <label key={cat} className="filter-option">
                       <input
                         type="checkbox"
                         checked={selectedCategories.includes(cat)}
                         onChange={() => toggleCategory(cat)}
-                        style={{ width: 16, height: 16, accentColor: '#E82127' }}
                       />
-                      <span style={{ fontSize: 13, color: '#374151' }}>{formatCategory(cat)}</span>
+                      <span>{formatCategory(cat)}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Stores */}
-              <div style={{ padding: '16px 20px', maxHeight: 200, overflowY: 'auto' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 12 }}>Store</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="filter-section">
+                <div className="filter-section-title">Store</div>
+                <div className="filter-options">
                   {stats.sources.map(source => (
-                    <label key={source} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                    <label key={source} className="filter-option">
                       <input
                         type="checkbox"
                         checked={selectedSources.includes(source)}
                         onChange={() => toggleSource(source)}
-                        style={{ width: 16, height: 16, accentColor: '#E82127' }}
                       />
-                      <span style={{ fontSize: 13, color: '#374151' }}>{source}</span>
+                      <span>{source}</span>
                     </label>
                   ))}
                 </div>
               </div>
+
+              {/* Mobile Apply Button */}
+              {isMobile && (
+                <div className="filter-apply-section">
+                  <button onClick={closeMobileFilters} className="filter-apply-btn">
+                    Show {totalProducts.toLocaleString()} Results
+                  </button>
+                </div>
+              )}
             </div>
           </aside>
         )}
 
         {/* Main Content Area */}
-        <main style={{ flex: 1, minWidth: 0 }}>
+        <main className={`products-main ${showFilters && !isMobile ? 'with-sidebar' : ''}`}>
           {/* Active Filters & Results Count */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: '#6b7280' }}>
-                <strong style={{ color: '#111' }}>{totalProducts.toLocaleString()}</strong> products
+          <div className="results-header">
+            <div className="results-info">
+              <span className="results-count">
+                <strong>{totalProducts.toLocaleString()}</strong> products
               </span>
 
               {/* Active Filter Pills */}
-              {selectedModels.map(m => (
-                <span key={m} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: '#fee2e2', color: '#dc2626', fontSize: 12, fontWeight: 500, borderRadius: 20 }}>
-                  {MODEL_LABELS[m] || m}
-                  <button onClick={() => toggleModel(m)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#dc2626' }}>×</button>
-                </span>
-              ))}
-              {selectedCategories.map(c => (
-                <span key={c} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: '#fef3c7', color: '#92400e', fontSize: 12, fontWeight: 500, borderRadius: 20 }}>
-                  {formatCategory(c)}
-                  <button onClick={() => toggleCategory(c)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#92400e' }}>×</button>
-                </span>
-              ))}
-              {selectedSources.map(s => (
-                <span key={s} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: '#dbeafe', color: '#1d4ed8', fontSize: 12, fontWeight: 500, borderRadius: 20 }}>
-                  {s}
-                  <button onClick={() => toggleSource(s)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#1d4ed8' }}>×</button>
-                </span>
-              ))}
-              {onlyDiscounted && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: '#dcfce7', color: '#16a34a', fontSize: 12, fontWeight: 500, borderRadius: 20 }}>
-                  On Sale
-                  <button onClick={() => setOnlyDiscounted(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#16a34a' }}>×</button>
-                </span>
-              )}
+              <div className="filter-pills">
+                {selectedModels.map(m => (
+                  <span key={m} className="pill pill-red">
+                    {MODEL_LABELS[m] || m}
+                    <button onClick={() => toggleModel(m)}>×</button>
+                  </span>
+                ))}
+                {selectedCategories.map(c => (
+                  <span key={c} className="pill pill-yellow">
+                    {formatCategory(c)}
+                    <button onClick={() => toggleCategory(c)}>×</button>
+                  </span>
+                ))}
+                {selectedSources.map(s => (
+                  <span key={s} className="pill pill-blue">
+                    {s}
+                    <button onClick={() => toggleSource(s)}>×</button>
+                  </span>
+                ))}
+                {onlyDiscounted && (
+                  <span className="pill pill-green">
+                    On Sale
+                    <button onClick={() => setOnlyDiscounted(false)}>×</button>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -570,165 +511,66 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           {viewMode === 'products' && (
             <>
               {error ? (
-                <div style={{
-                  padding: 48,
-                  textAlign: 'center',
-                  background: '#fef2f2',
-                  borderRadius: 12,
-                  border: '1px solid #fecaca'
-                }}>
-                  <h3 style={{ color: '#dc2626', marginBottom: 8, fontSize: 18, fontWeight: 600 }}>
-                    Failed to load products
-                  </h3>
-                  <p style={{ color: '#991b1b', marginBottom: 16, fontSize: 14 }}>
-                    Please try refreshing the page.
-                  </p>
-                  <button
-                    onClick={() => window.location.reload()}
-                    style={{
-                      padding: '10px 20px',
-                      background: '#E82127',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      fontSize: 14,
-                      fontWeight: 500
-                    }}
-                  >
-                    Refresh Page
-                  </button>
+                <div className="error-state">
+                  <h3>Failed to load products</h3>
+                  <p>Please try refreshing the page.</p>
+                  <button onClick={() => window.location.reload()}>Refresh Page</button>
                 </div>
               ) : showLoadingState ? (
-                <ProductSkeleton count={ITEMS_PER_PAGE} showFilters={showFilters} />
+                <ProductSkeleton count={ITEMS_PER_PAGE} showFilters={showFilters && !isMobile} />
               ) : (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: showFilters ? 'repeat(auto-fill, minmax(220px, 1fr))' : 'repeat(auto-fill, minmax(240px, 1fr))',
-                  gap: 16,
-                  opacity: isValidating ? 0.7 : 1,
-                  transition: 'opacity 0.2s ease',
-                }}>
+                <div className={`products-grid ${isValidating ? 'loading' : ''}`}>
                   {products.map((p, idx) => {
                     const discount = getDiscountInfo(p.url);
                     const affiliateUrl = getAffiliateUrl(p.url);
                     return (
-                      <div
-                        key={`${p.url}-${idx}`}
-                        style={{
-                          background: '#fff',
-                          borderRadius: 12,
-                          overflow: 'hidden',
-                          border: '1px solid #e5e7eb',
-                          transition: 'all 0.2s ease',
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}
-                      >
-                        <Link
-                          href={`/product/${generateSlug(p.title)}`}
-                          style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
-                        >
-                          <div style={{ position: 'relative' }}>
+                      <div key={`${p.url}-${idx}`} className="product-card">
+                        <Link href={`/product/${generateSlug(p.title)}`} className="product-link">
+                          <div className="product-image-wrap">
                             {p.image && (
-                              <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden', position: 'relative' }}>
-                                <Image
-                                  src={p.image}
-                                  alt={p.title}
-                                  fill
-                                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                  style={{ objectFit: 'cover' }}
-                                  loading={idx < 12 ? 'eager' : 'lazy'}
-                                />
-                              </div>
+                              <Image
+                                src={p.image}
+                                alt={p.title}
+                                fill
+                                sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                                style={{ objectFit: 'cover' }}
+                                loading={idx < 8 ? 'eager' : 'lazy'}
+                              />
                             )}
                             {discount && (
-                              <div style={{
-                                position: 'absolute',
-                                top: 8,
-                                left: 8,
-                                background: '#16a34a',
-                                color: '#fff',
-                                padding: '4px 10px',
-                                borderRadius: 6,
-                                fontSize: 12,
-                                fontWeight: 700
-                              }}>
-                                {discount.percent}% OFF
-                              </div>
+                              <div className="discount-badge">{discount.percent}% OFF</div>
                             )}
                           </div>
-                          <div style={{ padding: 14 }}>
-                            <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+                          <div className="product-info">
+                            <div className="product-meta">
                               <span>{p.source}</span>
                               {p.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
-                                <span key={m} style={{ color: '#9ca3af' }}>{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
+                                <span key={m} className="product-model">{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
                               ))}
                             </div>
-                            <h3 style={{
-                              fontSize: 14,
-                              fontWeight: 500,
-                              color: '#111',
-                              marginBottom: 10,
-                              lineHeight: 1.4,
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              minHeight: 40
-                            }}>
-                              {p.title}
-                            </h3>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                            <h3 className="product-title">{p.title}</h3>
+                            <div className="product-price">
                               {discount ? (
                                 <>
-                                  <span style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
+                                  <span className="price-discounted">
                                     ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
                                   </span>
-                                  <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through' }}>
-                                    ${p.price.toFixed(0)}
-                                  </span>
+                                  <span className="price-original">${p.price.toFixed(0)}</span>
                                 </>
                               ) : (
-                                <span style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>${p.price.toFixed(0)}</span>
+                                <span className="price-regular">${p.price.toFixed(0)}</span>
                               )}
                             </div>
                             {discount && (
-                              <div style={{
-                                marginTop: 8,
-                                padding: '6px 10px',
-                                background: '#f0fdf4',
-                                borderRadius: 6,
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                              }}>
-                                <span style={{ fontSize: 11, color: '#16a34a' }}>Use code:</span>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>
-                                  {discount.code}
-                                </span>
+                              <div className="discount-code">
+                                <span>Use code:</span>
+                                <span className="code">{discount.code}</span>
                               </div>
                             )}
                           </div>
                         </Link>
-                        <div style={{ padding: '0 14px 14px' }}>
-                          <a
-                            href={affiliateUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              padding: '10px',
-                              background: '#E82127',
-                              color: '#fff',
-                              borderRadius: 8,
-                              fontSize: 13,
-                              fontWeight: 600,
-                              textDecoration: 'none',
-                              textAlign: 'center'
-                            }}
-                          >
+                        <div className="product-action">
+                          <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" className="buy-btn">
                             Visit {p.source} →
                           </a>
                         </div>
@@ -740,78 +582,33 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 32 }}>
+                <div className="pagination">
                   <button
                     onClick={() => setPage(1)}
                     disabled={page === 1}
-                    style={{
-                      padding: '10px 16px',
-                      fontSize: 13,
-                      fontWeight: 500,
-                      border: '1px solid #e5e7eb',
-                      borderRadius: 8,
-                      background: '#fff',
-                      cursor: page === 1 ? 'not-allowed' : 'pointer',
-                      opacity: page === 1 ? 0.5 : 1
-                    }}
+                    className="page-btn"
                   >
                     First
                   </button>
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: 13,
-                      fontWeight: 500,
-                      border: '1px solid #e5e7eb',
-                      borderRadius: 8,
-                      background: '#fff',
-                      cursor: page === 1 ? 'not-allowed' : 'pointer',
-                      opacity: page === 1 ? 0.5 : 1
-                    }}
+                    className="page-btn"
                   >
                     ← Prev
                   </button>
-                  <div style={{
-                    padding: '10px 24px',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    background: '#111',
-                    color: '#fff',
-                    borderRadius: 8
-                  }}>
-                    {page} / {totalPages}
-                  </div>
+                  <div className="page-current">{page} / {totalPages}</div>
                   <button
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: 13,
-                      fontWeight: 500,
-                      border: '1px solid #e5e7eb',
-                      borderRadius: 8,
-                      background: '#fff',
-                      cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                      opacity: page === totalPages ? 0.5 : 1
-                    }}
+                    className="page-btn"
                   >
                     Next →
                   </button>
                   <button
                     onClick={() => setPage(totalPages)}
                     disabled={page === totalPages}
-                    style={{
-                      padding: '10px 16px',
-                      fontSize: 13,
-                      fontWeight: 500,
-                      border: '1px solid #e5e7eb',
-                      borderRadius: 8,
-                      background: '#fff',
-                      cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                      opacity: page === totalPages ? 0.5 : 1
-                    }}
+                    className="page-btn"
                   >
                     Last
                   </button>
@@ -822,55 +619,36 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
           {/* Comparisons View */}
           {viewMode === 'comparisons' && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: showFilters ? 'repeat(auto-fill, minmax(280px, 1fr))' : 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 16
-            }}>
+            <div className="comparisons-grid">
               {filteredMatches.map((match) => (
                 <article
                   key={match.matchKey}
                   onClick={() => setSelectedMatch(match)}
-                  style={{
-                    background: '#fff',
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    border: '1px solid #e5e7eb'
-                  }}
+                  className="comparison-card"
                 >
                   {match.products[0]?.image && (
-                    <div style={{ aspectRatio: '16/10', background: '#f9fafb', overflow: 'hidden', position: 'relative' }}>
+                    <div className="comparison-image">
                       <Image
                         src={match.products[0].image}
                         alt={match.products[0].title}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
                         style={{ objectFit: 'cover' }}
                       />
-                      <div style={{ position: 'absolute', top: 8, right: 8, background: '#16a34a', color: '#fff', padding: '6px 12px', borderRadius: 6, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
-                        Save {match.savingsPercent}%
-                      </div>
+                      <div className="savings-badge">Save {match.savingsPercent}%</div>
                     </div>
                   )}
-                  <div style={{ padding: 16 }}>
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                      <span style={{ fontSize: 11, padding: '4px 8px', background: '#fef3c7', color: '#92400e', borderRadius: 4, fontWeight: 600 }}>
-                        {match.products.length} stores
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {match.products[0]?.title}
-                    </h3>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                  <div className="comparison-info">
+                    <div className="store-count">{match.products.length} stores</div>
+                    <h3 className="comparison-title">{match.products[0]?.title}</h3>
+                    <div className="comparison-prices">
                       <div>
-                        <span style={{ fontSize: 11, color: '#6b7280' }}>Best price</span>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: '#16a34a' }}>${match.lowestPrice.toFixed(0)}</div>
+                        <span className="price-label">Best price</span>
+                        <div className="best-price">${match.lowestPrice.toFixed(0)}</div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: 11, color: '#6b7280' }}>You save</span>
-                        <div style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>${match.savings.toFixed(0)}</div>
+                      <div className="savings-info">
+                        <span className="price-label">You save</span>
+                        <div className="savings-amount">${match.savings.toFixed(0)}</div>
                       </div>
                     </div>
                   </div>
@@ -884,74 +662,57 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
       {/* Modal */}
       {selectedMatch && (
         <>
-          <div onClick={() => setSelectedMatch(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200 }} />
-          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 600, maxHeight: '85vh', background: '#fff', borderRadius: 16, overflow: 'hidden', zIndex: 201 }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="modal-overlay" onClick={() => setSelectedMatch(null)} />
+          <div className="modal">
+            <div className="modal-header">
               <div>
-                <h2 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.3, marginBottom: 4 }}>{selectedMatch.products[0]?.title}</h2>
-                <p style={{ fontSize: 13, color: '#6b7280' }}>{selectedMatch.products.length} stores compared</p>
+                <h2>{selectedMatch.products[0]?.title}</h2>
+                <p>{selectedMatch.products.length} stores compared</p>
               </div>
-              <button onClick={() => setSelectedMatch(null)} style={{ background: '#f3f4f6', border: 'none', width: 32, height: 32, borderRadius: 8, cursor: 'pointer', fontSize: 18 }}>×</button>
+              <button onClick={() => setSelectedMatch(null)} className="modal-close">×</button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: '1px solid #e5e7eb' }}>
-              {[
-                { l: 'Best Price', v: `$${selectedMatch.lowestPrice.toFixed(0)}`, c: '#16a34a' },
-                { l: 'Highest', v: `$${selectedMatch.highestPrice.toFixed(0)}`, c: '#9ca3af' },
-                { l: 'You Save', v: `$${selectedMatch.savings.toFixed(0)}`, c: '#E82127' }
-              ].map((x, i) => (
-                <div key={i} style={{ padding: 16, textAlign: 'center', borderRight: i < 2 ? '1px solid #e5e7eb' : 'none' }}>
-                  <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{x.l}</div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: x.c }}>{x.v}</div>
-                </div>
-              ))}
+            <div className="modal-stats">
+              <div className="modal-stat">
+                <span>Best Price</span>
+                <strong className="green">${selectedMatch.lowestPrice.toFixed(0)}</strong>
+              </div>
+              <div className="modal-stat">
+                <span>Highest</span>
+                <strong>${selectedMatch.highestPrice.toFixed(0)}</strong>
+              </div>
+              <div className="modal-stat">
+                <span>You Save</span>
+                <strong className="red">${selectedMatch.savings.toFixed(0)}</strong>
+              </div>
             </div>
-            <div style={{ padding: 20, maxHeight: 'calc(85vh - 180px)', overflowY: 'auto' }}>
+            <div className="modal-body">
               {selectedMatch.products.sort((a, b) => a.price - b.price).map((p, i) => {
                 const discountInfo = getDiscountInfo(p.url);
                 const affiliateUrl = getAffiliateUrl(p.url);
 
                 return (
-                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', background: i === 0 ? '#f0fdf4' : '#f9fafb', borderRadius: 10, marginBottom: 10, border: i === 0 ? '2px solid #86efac' : '1px solid #e5e7eb', alignItems: 'center' }}>
+                  <div key={i} className={`store-row ${i === 0 ? 'best' : ''}`}>
                     {p.image && (
-                      <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#fff', border: '1px solid #e5e7eb', position: 'relative' }}>
+                      <div className="store-image">
                         <Image src={p.image} alt={p.title} fill sizes="64px" style={{ objectFit: 'cover' }} />
                       </div>
                     )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontWeight: 600, fontSize: 15 }}>{p.source}</span>
-                          {i === 0 && <span style={{ fontSize: 10, padding: '3px 8px', background: '#16a34a', color: '#fff', borderRadius: 4, fontWeight: 700 }}>BEST PRICE</span>}
+                    <div className="store-info">
+                      <div className="store-header">
+                        <div className="store-name">
+                          <span>{p.source}</span>
+                          {i === 0 && <span className="best-badge">BEST PRICE</span>}
                         </div>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: i === 0 ? '#16a34a' : '#111' }}>${p.price.toFixed(2)}</span>
+                        <span className={`store-price ${i === 0 ? 'green' : ''}`}>${p.price.toFixed(2)}</span>
                       </div>
                       {discountInfo && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 500 }}>
-                            Extra {discountInfo.percent}% off with code:
-                          </span>
-                          <span style={{ fontSize: 13, fontFamily: 'monospace', background: '#dcfce7', padding: '3px 8px', borderRadius: 4, fontWeight: 700, color: '#15803d' }}>
-                            {discountInfo.code}
-                          </span>
+                        <div className="store-discount">
+                          <span>Extra {discountInfo.percent}% off with code:</span>
+                          <span className="code">{discountInfo.code}</span>
                         </div>
                       )}
                     </div>
-                    <a
-                      href={affiliateUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        padding: '10px 20px',
-                        background: i === 0 ? '#16a34a' : '#E82127',
-                        color: '#fff',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}
-                    >
+                    <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" className={`store-btn ${i === 0 ? 'green' : ''}`}>
                       Visit →
                     </a>
                   </div>
@@ -962,14 +723,1117 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
         </>
       )}
 
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: translateY(-50%) rotate(0deg); }
-            to { transform: translateY(-50%) rotate(360deg); }
+      <style jsx>{`
+        .home-container {
+          min-height: 100vh;
+          background: #f8f9fa;
+        }
+
+        /* Header */
+        .home-header {
+          background: #0a0a0a;
+          padding: 14px 0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .header-inner {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+        }
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+        .logo {
+          color: #fff;
+          text-decoration: none;
+          font-size: 18px;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+        .logo-accent { color: #E82127; }
+
+        .top10-dropdown { position: relative; }
+        .top10-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: none;
+          border: none;
+          color: #fbbf24;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 8px 0;
+        }
+        .top10-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+          min-width: 260px;
+          padding: 8px 0;
+          z-index: 200;
+        }
+        .top10-item {
+          display: block;
+          padding: 10px 16px;
+          color: #374151;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 500;
+        }
+        .top10-item:hover { background: #f3f4f6; }
+        .top10-header {
+          font-weight: 600;
+          color: #111;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .view-toggle {
+          display: flex;
+          gap: 4px;
+          background: #1f1f1f;
+          border-radius: 8px;
+          padding: 4px;
+        }
+        .toggle-btn {
+          padding: 10px 14px;
+          font-size: 13px;
+          font-weight: 500;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          background: transparent;
+          color: #fff;
+          transition: background 0.2s;
+          min-height: 40px;
+        }
+        .toggle-btn.active { background: #E82127; }
+
+        .header-stats {
+          display: flex;
+          gap: 20px;
+          font-size: 13px;
+          color: #a3a3a3;
+        }
+        .header-stats strong { color: #fff; }
+        .stat-sale strong { color: #16a34a; }
+
+        /* Search Bar */
+        .search-bar {
+          background: #fff;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 12px 0;
+        }
+        .search-inner {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 16px;
+        }
+        .search-row {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .search-input-wrap {
+          position: relative;
+          flex: 1;
+          min-width: 200px;
+        }
+        .search-input {
+          width: 100%;
+          padding: 14px 16px 14px 44px;
+          font-size: 16px;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          background: #fff;
+          outline: none;
+          min-height: 48px;
+        }
+        .search-input:focus { border-color: #9ca3af; }
+        .search-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 20px;
+          height: 20px;
+          color: #9ca3af;
+        }
+        .search-spinner {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 16px;
+          height: 16px;
+          border: 2px solid #e5e7eb;
+          border-top-color: #E82127;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+
+        .filter-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 16px;
+          font-size: 14px;
+          font-weight: 500;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          background: #fff;
+          cursor: pointer;
+          min-height: 44px;
+        }
+        .filter-btn.active { background: #f3f4f6; }
+        .filter-badge {
+          background: #E82127;
+          color: #fff;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 2px 8px;
+          border-radius: 10px;
+        }
+
+        .sort-select {
+          padding: 14px 16px;
+          font-size: 14px;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          background: #fff;
+          cursor: pointer;
+          min-width: 140px;
+          min-height: 44px;
+        }
+
+        /* Main Content */
+        .main-content {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 16px;
+          display: flex;
+          gap: 24px;
+          position: relative;
+        }
+
+        /* Filter Overlay (mobile) */
+        .filter-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 150;
+        }
+
+        /* Filter Sidebar */
+        .filter-sidebar {
+          width: 280px;
+          flex-shrink: 0;
+        }
+        .filter-sidebar.mobile {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          max-width: 320px;
+          z-index: 200;
+          background: #fff;
+          animation: slideIn 0.3s ease;
+        }
+        .filter-container {
+          background: #fff;
+          border-radius: 12px;
+          border: 1px solid #e5e7eb;
+          overflow: hidden;
+          position: sticky;
+          top: 80px;
+          max-height: calc(100vh - 100px);
+          overflow-y: auto;
+        }
+        .filter-sidebar.mobile .filter-container {
+          position: static;
+          max-height: 100vh;
+          border: none;
+          border-radius: 0;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .filter-header {
+          padding: 16px 20px;
+          border-bottom: 1px solid #e5e7eb;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .filter-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: #111;
+        }
+        .filter-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .clear-filters-btn {
+          font-size: 14px;
+          color: #E82127;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-weight: 500;
+          padding: 8px;
+          min-height: 44px;
+        }
+        .close-filters-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #6b7280;
+          padding: 8px;
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .filter-section {
+          padding: 16px 20px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .filter-section-scroll {
+          max-height: 200px;
+          overflow-y: auto;
+        }
+        .filter-section-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #111;
+          margin-bottom: 12px;
+        }
+
+        .discount-toggle {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          padding: 8px 0;
+          min-height: 44px;
+        }
+        .discount-toggle input {
+          width: 20px;
+          height: 20px;
+          accent-color: #16a34a;
+          cursor: pointer;
+        }
+        .discount-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #111;
+        }
+        .discount-count {
+          font-size: 12px;
+          color: #16a34a;
+          font-weight: 600;
+          margin-left: auto;
+        }
+
+        .price-inputs {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .price-input-group {
+          flex: 1;
+        }
+        .price-input-group label {
+          font-size: 11px;
+          color: #6b7280;
+          display: block;
+          margin-bottom: 4px;
+        }
+        .price-input-group input {
+          width: 100%;
+          padding: 10px 12px;
+          font-size: 16px;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          min-height: 44px;
+        }
+        .price-slider {
+          width: 100%;
+          accent-color: #E82127;
+        }
+        .price-range-labels {
+          display: flex;
+          justify-content: space-between;
+          font-size: 11px;
+          color: #6b7280;
+          margin-top: 4px;
+        }
+
+        .filter-options {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .filter-option {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          padding: 6px 0;
+          min-height: 44px;
+        }
+        .filter-option input {
+          width: 18px;
+          height: 18px;
+          accent-color: #E82127;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+        .filter-option span {
+          font-size: 14px;
+          color: #374151;
+          flex: 1;
+        }
+
+        .filter-apply-section {
+          padding: 16px 20px;
+          border-top: 1px solid #e5e7eb;
+          margin-top: auto;
+        }
+        .filter-apply-btn {
+          width: 100%;
+          padding: 14px;
+          background: #E82127;
+          color: #fff;
+          border: none;
+          border-radius: 10px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          min-height: 48px;
+        }
+
+        /* Products Main */
+        .products-main {
+          flex: 1;
+          min-width: 0;
+        }
+        .products-main.with-sidebar {
+          /* No special styles needed */
+        }
+
+        .results-header {
+          margin-bottom: 16px;
+        }
+        .results-info {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+        .results-count {
+          font-size: 14px;
+          color: #6b7280;
+        }
+        .results-count strong { color: #111; }
+
+        .filter-pills {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 12px;
+          font-size: 12px;
+          font-weight: 500;
+          border-radius: 20px;
+        }
+        .pill button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 4px;
+          min-width: 24px;
+          min-height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .pill-red { background: #fee2e2; color: #dc2626; }
+        .pill-red button { color: #dc2626; }
+        .pill-yellow { background: #fef3c7; color: #92400e; }
+        .pill-yellow button { color: #92400e; }
+        .pill-blue { background: #dbeafe; color: #1d4ed8; }
+        .pill-blue button { color: #1d4ed8; }
+        .pill-green { background: #dcfce7; color: #16a34a; }
+        .pill-green button { color: #16a34a; }
+
+        .error-state {
+          padding: 48px 24px;
+          text-align: center;
+          background: #fef2f2;
+          border-radius: 12px;
+          border: 1px solid #fecaca;
+        }
+        .error-state h3 {
+          color: #dc2626;
+          margin-bottom: 8px;
+          font-size: 18px;
+          font-weight: 600;
+        }
+        .error-state p {
+          color: #991b1b;
+          margin-bottom: 16px;
+          font-size: 14px;
+        }
+        .error-state button {
+          padding: 10px 20px;
+          background: #E82127;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        /* Products Grid */
+        .products-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+          transition: opacity 0.2s ease;
+        }
+        .products-grid.loading { opacity: 0.7; }
+
+        .product-card {
+          background: #fff;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid #e5e7eb;
+          display: flex;
+          flex-direction: column;
+        }
+        .product-link {
+          text-decoration: none;
+          color: inherit;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .product-image-wrap {
+          position: relative;
+          aspect-ratio: 4/3;
+          background: #f9fafb;
+        }
+        .discount-badge {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          background: #16a34a;
+          color: #fff;
+          padding: 5px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 700;
+        }
+        .product-info {
+          padding: 12px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .product-meta {
+          font-size: 12px;
+          color: #6b7280;
+          margin-bottom: 6px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .product-model { color: #9ca3af; }
+        .product-title {
+          font-size: 14px;
+          font-weight: 500;
+          color: #111;
+          margin-bottom: 8px;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          min-height: 39px;
+        }
+        .product-price {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          margin-top: auto;
+        }
+        .price-discounted {
+          font-size: 16px;
+          font-weight: 700;
+          color: #16a34a;
+        }
+        .price-original {
+          font-size: 12px;
+          color: #9ca3af;
+          text-decoration: line-through;
+        }
+        .price-regular {
+          font-size: 16px;
+          font-weight: 700;
+          color: #111;
+        }
+        .discount-code {
+          margin-top: 8px;
+          padding: 6px 10px;
+          background: #f0fdf4;
+          border-radius: 6px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .discount-code span:first-child {
+          font-size: 11px;
+          color: #16a34a;
+        }
+        .discount-code .code {
+          font-size: 12px;
+          font-weight: 700;
+          color: #15803d;
+          font-family: monospace;
+        }
+        .product-action {
+          padding: 0 12px 12px;
+        }
+        .buy-btn {
+          display: block;
+          width: 100%;
+          padding: 12px;
+          background: #E82127;
+          color: #fff;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+          text-align: center;
+          min-height: 44px;
+        }
+
+        /* Pagination */
+        .pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          margin-top: 24px;
+          flex-wrap: wrap;
+        }
+        .page-btn {
+          padding: 12px 18px;
+          font-size: 14px;
+          font-weight: 500;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          background: #fff;
+          cursor: pointer;
+          min-height: 44px;
+          min-width: 44px;
+        }
+        .page-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .page-current {
+          padding: 12px 20px;
+          font-size: 14px;
+          font-weight: 600;
+          background: #111;
+          color: #fff;
+          border-radius: 8px;
+          min-height: 44px;
+        }
+
+        /* Comparisons Grid */
+        .comparisons-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+        .comparison-card {
+          background: #fff;
+          border-radius: 12px;
+          overflow: hidden;
+          cursor: pointer;
+          border: 1px solid #e5e7eb;
+        }
+        .comparison-image {
+          position: relative;
+          aspect-ratio: 16/10;
+          background: #f9fafb;
+        }
+        .savings-badge {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: #16a34a;
+          color: #fff;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 700;
+        }
+        .comparison-info {
+          padding: 16px;
+        }
+        .store-count {
+          font-size: 11px;
+          padding: 4px 8px;
+          background: #fef3c7;
+          color: #92400e;
+          border-radius: 4px;
+          font-weight: 600;
+          display: inline-block;
+          margin-bottom: 10px;
+        }
+        .comparison-title {
+          font-size: 15px;
+          font-weight: 600;
+          margin-bottom: 12px;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .comparison-prices {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+        }
+        .price-label {
+          font-size: 11px;
+          color: #6b7280;
+          display: block;
+        }
+        .best-price {
+          font-size: 22px;
+          font-weight: 700;
+          color: #16a34a;
+        }
+        .savings-info { text-align: right; }
+        .savings-amount {
+          font-size: 16px;
+          font-weight: 700;
+          color: #111;
+        }
+
+        /* Modal */
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          z-index: 200;
+        }
+        .modal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: calc(100% - 32px);
+          max-width: 600px;
+          max-height: 85vh;
+          background: #fff;
+          border-radius: 16px;
+          overflow: hidden;
+          z-index: 201;
+        }
+        .modal-header {
+          padding: 20px;
+          border-bottom: 1px solid #e5e7eb;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+        .modal-header h2 {
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 1.3;
+          margin-bottom: 4px;
+        }
+        .modal-header p {
+          font-size: 13px;
+          color: #6b7280;
+        }
+        .modal-close {
+          background: #f3f4f6;
+          border: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+        .modal-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .modal-stat {
+          padding: 16px;
+          text-align: center;
+          border-right: 1px solid #e5e7eb;
+        }
+        .modal-stat:last-child { border-right: none; }
+        .modal-stat span {
+          font-size: 11px;
+          color: #6b7280;
+          display: block;
+          margin-bottom: 4px;
+        }
+        .modal-stat strong {
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .modal-stat .green { color: #16a34a; }
+        .modal-stat .red { color: #E82127; }
+        .modal-body {
+          padding: 16px;
+          max-height: calc(85vh - 180px);
+          overflow-y: auto;
+        }
+        .store-row {
+          display: flex;
+          gap: 12px;
+          padding: 12px;
+          background: #f9fafb;
+          border-radius: 10px;
+          margin-bottom: 10px;
+          border: 1px solid #e5e7eb;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .store-row.best {
+          background: #f0fdf4;
+          border: 2px solid #86efac;
+        }
+        .store-image {
+          width: 56px;
+          height: 56px;
+          border-radius: 8px;
+          overflow: hidden;
+          flex-shrink: 0;
+          background: #fff;
+          border: 1px solid #e5e7eb;
+          position: relative;
+        }
+        .store-info {
+          flex: 1;
+          min-width: 0;
+        }
+        .store-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 4px;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .store-name {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+          font-size: 14px;
+        }
+        .best-badge {
+          font-size: 10px;
+          padding: 3px 8px;
+          background: #16a34a;
+          color: #fff;
+          border-radius: 4px;
+          font-weight: 700;
+        }
+        .store-price {
+          font-size: 16px;
+          font-weight: 700;
+        }
+        .store-price.green { color: #16a34a; }
+        .store-discount {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          color: #16a34a;
+          flex-wrap: wrap;
+        }
+        .store-discount .code {
+          font-family: monospace;
+          background: #dcfce7;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-weight: 700;
+          color: #15803d;
+        }
+        .store-btn {
+          padding: 12px 18px;
+          background: #E82127;
+          color: #fff;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+          white-space: nowrap;
+          flex-shrink: 0;
+          min-height: 44px;
+        }
+        .store-btn.green { background: #16a34a; }
+
+        /* Desktop visibility */
+        .desktop-only { display: flex; }
+
+        /* Responsive */
+        @media (min-width: 640px) {
+          .products-grid {
+            grid-template-columns: repeat(3, 1fr);
           }
-        `}
-      </style>
+          .comparisons-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (min-width: 768px) {
+          .products-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+          }
+          .comparisons-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+          .product-info {
+            padding: 14px;
+          }
+          .product-title {
+            font-size: 14px;
+          }
+          .price-discounted, .price-regular {
+            font-size: 18px;
+          }
+          .buy-btn {
+            font-size: 13px;
+          }
+          .filter-btn-text {
+            display: inline;
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .products-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+          .comparisons-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .header-inner {
+            padding: 0 24px;
+          }
+          .search-inner {
+            padding: 0 24px;
+          }
+          .main-content {
+            padding: 24px;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          .products-grid {
+            grid-template-columns: repeat(5, 1fr);
+          }
+        }
+
+        @media (max-width: 767px) {
+          .filter-overlay {
+            display: block;
+          }
+          .desktop-only {
+            display: none !important;
+          }
+          .filter-btn-text {
+            display: none;
+          }
+          .sort-select {
+            min-width: 110px;
+            padding: 14px 10px;
+            font-size: 14px;
+          }
+          .modal-header h2 {
+            font-size: 15px;
+          }
+          .modal-stat strong {
+            font-size: 18px;
+          }
+          .store-btn {
+            width: 100%;
+            text-align: center;
+            margin-top: 8px;
+          }
+        }
+
+        /* Small phones (iPhone SE, 375px and below) */
+        @media (max-width: 375px) {
+          .home-header {
+            padding: 12px 0;
+          }
+          .header-inner {
+            padding: 0 12px;
+            gap: 12px;
+          }
+          .logo {
+            font-size: 16px;
+          }
+          .view-toggle {
+            padding: 3px;
+          }
+          .toggle-btn {
+            padding: 7px 10px;
+            font-size: 11px;
+          }
+          .search-bar {
+            padding: 10px 0;
+          }
+          .search-inner {
+            padding: 0 12px;
+          }
+          .search-row {
+            gap: 6px;
+          }
+          .search-input {
+            font-size: 16px;
+            padding: 13px 14px 13px 42px;
+            -webkit-text-size-adjust: 100%;
+          }
+          .price-input-group input {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+          }
+          .filter-btn {
+            padding: 13px 12px;
+          }
+          .sort-select {
+            min-width: 95px;
+            padding: 13px 8px;
+            font-size: 13px;
+          }
+          .main-content {
+            padding: 12px;
+          }
+          .products-grid {
+            gap: 12px;
+          }
+          .comparisons-grid {
+            gap: 12px;
+          }
+          .product-info {
+            padding: 10px;
+          }
+          .product-title {
+            font-size: 13px;
+            min-height: 36px;
+          }
+          .product-meta {
+            font-size: 10px;
+          }
+          .price-discounted, .price-regular {
+            font-size: 15px;
+          }
+          .price-original {
+            font-size: 11px;
+          }
+          .buy-btn {
+            padding: 11px;
+            font-size: 13px;
+          }
+          .product-action {
+            padding: 0 10px 10px;
+          }
+          .pagination {
+            gap: 6px;
+          }
+          .page-btn {
+            padding: 11px 14px;
+            font-size: 13px;
+          }
+          .page-current {
+            padding: 11px 16px;
+            font-size: 13px;
+          }
+        }
+
+        /* Landscape phones (improve usability) */
+        @media (max-width: 767px) and (orientation: landscape) {
+          .home-header {
+            padding: 8px 0;
+          }
+          .header-inner {
+            gap: 12px;
+          }
+          .view-toggle {
+            padding: 3px;
+          }
+          .toggle-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+            min-height: 36px;
+          }
+          .search-bar {
+            padding: 8px 0;
+          }
+          .search-input {
+            padding: 10px 14px 10px 42px;
+            min-height: 40px;
+          }
+          .filter-btn, .sort-select {
+            padding: 10px 14px;
+            min-height: 40px;
+          }
+          .filter-sidebar.mobile {
+            max-width: 280px;
+          }
+        }
+
+        @keyframes spin {
+          from { transform: translateY(-50%) rotate(0deg); }
+          to { transform: translateY(-50%) rotate(360deg); }
+        }
+        @keyframes slideIn {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
