@@ -72,6 +72,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    // AI/LLM context files for GEO
+    {
+      url: `${baseUrl}/llms.txt`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.5,
+    },
   ];
 
   // Model pages
