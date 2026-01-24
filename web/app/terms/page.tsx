@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -70,14 +69,14 @@ export default function TermsPage() {
             <ul style={{ paddingLeft: 24, marginBottom: 16 }}>
               <li style={{ marginBottom: 8 }}>Use the site for personal, non-commercial purposes</li>
               <li style={{ marginBottom: 8 }}>Not attempt to scrape, copy, or redistribute our content</li>
-              <li style={{ marginBottom: 8 }}>Not interfere with the site's operation</li>
+              <li style={{ marginBottom: 8 }}>Not interfere with the site&apos;s operation</li>
             </ul>
 
             <h2 style={{ fontSize: 20, fontWeight: 600, color: '#111', marginTop: 32, marginBottom: 16 }}>
               Product Information
             </h2>
             <p style={{ marginBottom: 16 }}>
-              We strive to display accurate product information, but prices and availability change frequently. Always verify details on the retailer's website before purchasing. We are not responsible for:
+              We strive to display accurate product information, but prices and availability change frequently. Always verify details on the retailer&apos;s website before purchasing. We are not responsible for:
             </p>
             <ul style={{ paddingLeft: 24, marginBottom: 16 }}>
               <li style={{ marginBottom: 8 }}>Price changes after you view our site</li>
@@ -97,7 +96,7 @@ export default function TermsPage() {
               Disclaimer
             </h2>
             <p style={{ marginBottom: 16 }}>
-              EVPriceHunt is provided "as is" without warranties of any kind. We do not guarantee the accuracy, completeness, or timeliness of information on this site.
+              EVPriceHunt is provided &quot;as is&quot; without warranties of any kind. We do not guarantee the accuracy, completeness, or timeliness of information on this site.
             </p>
 
             <h2 style={{ fontSize: 20, fontWeight: 600, color: '#111', marginTop: 32, marginBottom: 16 }}>

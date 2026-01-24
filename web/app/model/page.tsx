@@ -36,15 +36,6 @@ export const metadata: Metadata = {
   },
 };
 
-const MODEL_IMAGES: Record<string, string> = {
-  'model-3': '/images/model-3.jpg',
-  'highland': '/images/highland.jpg',
-  'model-y': '/images/model-y.jpg',
-  'juniper': '/images/juniper.jpg',
-  'model-s': '/images/model-s.jpg',
-  'model-x': '/images/model-x.jpg',
-  'cybertruck': '/images/cybertruck.jpg',
-};
 
 const MODEL_COLORS: Record<string, string> = {
   'model-3': 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
@@ -201,7 +192,7 @@ export default function ModelsPage() {
           </h2>
           <div style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
             <p style={{ marginBottom: 16 }}>
-              Finding the right accessories for your Tesla is easy with EVPriceHunt. We've organized
+              Finding the right accessories for your Tesla is easy with EVPriceHunt. We&apos;ve organized
               our entire catalog by Tesla model, so you can quickly find products that are guaranteed
               to fit your specific vehicle.
             </p>

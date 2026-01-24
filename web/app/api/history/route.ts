@@ -1,12 +1,24 @@
 import { NextResponse } from 'next/server';
+import { dataCache } from '../../../lib/cache';
 import fs from 'fs/promises';
 import path from 'path';
 
 export async function GET() {
   try {
-    const historyPath = path.join(process.cwd(), 'data', 'price-history.json');
-    const data = await fs.readFile(historyPath, 'utf-8');
-    const history = JSON.parse(data);
+    const CACHE_KEY = 'price-history';
+
+    // Try to get from cache first
+    let history = dataCache.get<Record<string, unknown>>(CACHE_KEY);
+
+    if (!history) {
+      const historyPath = path.join(process.cwd(), 'data', 'price-history.json');
+      const data = await fs.readFile(historyPath, 'utf-8');
+      history = JSON.parse(data);
+
+      // Store in cache
+      dataCache.set(CACHE_KEY, history);
+    }
+
     return NextResponse.json(history);
   } catch (error) {
     // Return demo history data if file doesn't exist

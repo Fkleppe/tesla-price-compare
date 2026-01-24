@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import fs from 'fs/promises';
 import path from 'path';
-import ProductPageClient from './ProductPageClient';
-import { isAffiliatePartner, getDiscountInfo } from '../../../lib/affiliate';
+import ProductPageInteractive from './ProductPageInteractive';
+import { isAffiliatePartner, getDiscountInfo, getAffiliateUrl } from '../../../lib/affiliate';
 import { SITE_URL } from '../../../lib/constants';
+import Footer from '../../../components/Footer';
 
 interface Product {
   title: string;
@@ -89,7 +91,7 @@ const MODEL_NAMES: Record<string, string> = {
   'universal': 'Universal',
 };
 
-// Category display names - comprehensive list matching all product categories
+// Category display names
 const CATEGORY_NAMES: Record<string, string> = {
   'floor-mats': 'Floor Mats',
   'screen-protector': 'Screen Protectors',
@@ -131,6 +133,19 @@ const CATEGORY_NAMES: Record<string, string> = {
   'other': 'Tesla Accessories',
 };
 
+function formatCategory(cat: string): string {
+  return CATEGORY_NAMES[cat] || cat.split('-').map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+}
+
+function getModelNames(models: string[]): string {
+  if (!models || models.length === 0) return 'All Tesla Models';
+  const filtered = models.filter(m => m !== 'universal');
+  if (filtered.length === 0) return 'All Tesla Models';
+  return filtered.map(m => MODEL_NAMES[m] || m).join(', ');
+}
+
 // Generate metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -149,30 +164,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const modelNames = models.map(m => MODEL_NAMES[m] || m).join(' & ');
   const categoryName = CATEGORY_NAMES[product.category] || product.category;
 
-  // Create concise, keyword-rich title (under 60 chars ideally)
-  // Note: Layout template will append "| EVPriceHunt" automatically
   let title = product.title;
   if (title.length > 45) {
-    // Cut at word boundary
     const truncated = title.slice(0, 45);
     const lastSpace = truncated.lastIndexOf(' ');
     title = lastSpace > 20 ? truncated.slice(0, lastSpace) : truncated;
   }
   const fullTitle = `${title} | $${product.price}`;
 
-  // Create compelling meta description (under 160 chars)
-  // Focus on value proposition, compatibility, and call-to-action
   let description = '';
-
   if (discountInfo) {
-    // Lead with discount for products with codes
     description = `${discountInfo.percent}% off with code ${discountInfo.code}. `;
     if (modelNames) {
       description += `Custom-fit ${categoryName.toLowerCase()} for Tesla ${modelNames}. `;
     }
     description += `Only $${(product.price * (1 - discountInfo.percent / 100)).toFixed(0)} at ${product.source}.`;
   } else {
-    // Lead with product info for regular products
     if (modelNames) {
       description = `${categoryName} for Tesla ${modelNames}. `;
     } else {
@@ -181,7 +188,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description += `$${product.price.toFixed(0)} at ${product.source}. Compare prices across stores.`;
   }
 
-  // Ensure description is under 155 chars and ends properly
   if (description.length > 155) {
     const truncated = description.slice(0, 150);
     const lastSpace = truncated.lastIndexOf(' ');
@@ -270,7 +276,7 @@ function generateBreadcrumbJsonLd(product: Product, slug: string) {
       {
         '@type': 'ListItem',
         position: 2,
-        name: formatCategoryName(product.category),
+        name: formatCategory(product.category),
         item: `${SITE_URL}/category/${product.category}`,
       },
       {
@@ -280,105 +286,6 @@ function generateBreadcrumbJsonLd(product: Product, slug: string) {
         item: `${SITE_URL}/product/${slug}`,
       },
     ],
-  };
-}
-
-function formatCategoryName(category: string): string {
-  return category.split('-').map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
-}
-
-// Store info for FAQ answers
-const STORE_INFO: Record<string, { shipping: string; returns: string; established: string }> = {
-  'Tesery': { shipping: 'Free shipping over $49', returns: '30-day returns', established: '2018' },
-  'Yeslak': { shipping: 'Free shipping over $59', returns: '30-day returns', established: '2019' },
-  'Jowua': { shipping: 'Free worldwide shipping', returns: '14-day returns', established: '2017' },
-  'Hansshow': { shipping: 'Free shipping over $99', returns: '30-day returns', established: '2016' },
-  'Tesmanian': { shipping: 'Free shipping over $100', returns: '30-day returns', established: '2019' },
-  'TAPTES': { shipping: 'Free shipping over $69', returns: '30-day returns', established: '2018' },
-  'EVBASE': { shipping: 'Free shipping over $79', returns: '30-day returns', established: '2020' },
-  'Shop4Tesla': { shipping: 'EU warehouse available', returns: '14-day returns', established: '2019' },
-  'default': { shipping: 'Standard shipping rates apply', returns: '30-day returns', established: '2018' },
-};
-
-// Model years for FAQ
-const MODEL_YEARS: Record<string, string> = {
-  'model-3': '2017-2023',
-  'highland': '2024+',
-  'model-y': '2020-2024',
-  'juniper': '2025+',
-  'model-s': '2012+',
-  'model-x': '2015+',
-  'cybertruck': '2024+',
-  'universal': 'All Years',
-};
-
-// Generate FAQ JSON-LD with 10 comprehensive questions
-function generateFAQJsonLd(product: Product) {
-  const discountInfo = getDiscountInfo(product.url);
-  const models = product.models?.filter(m => m !== 'universal') || [];
-  const modelNames = models.map(m => MODEL_NAMES[m] || m).join(', ') || 'All Tesla Models';
-  const modelYears = models.map(m => MODEL_YEARS[m] || 'All Years').join(', ') || 'All Years';
-  const storeInfo = STORE_INFO[product.source] || STORE_INFO['default'];
-  const categoryName = formatCategoryName(product.category);
-
-  const faqs = [
-    {
-      question: `Is this ${categoryName.toLowerCase()} compatible with my Tesla?`,
-      answer: `This product is specifically designed for Tesla ${modelNames}, fitting model years ${modelYears}. Before ordering, verify your Tesla's model year by checking the vehicle identification plate or your Tesla app to ensure compatibility.`
-    },
-    {
-      question: `How do I install the ${product.title}?`,
-      answer: `Installation is straightforward and typically takes 10-30 minutes depending on the product type. Most Tesla accessories are designed for DIY installation with no special tools required. Detailed step-by-step instructions are included with your purchase.`
-    },
-    {
-      question: `How do I get the best price on this ${categoryName.toLowerCase()}?`,
-      answer: discountInfo
-        ? `Use the exclusive discount code "${discountInfo.code}" at checkout on ${product.source} to save ${discountInfo.percent}% off the regular price of $${product.price.toFixed(2)}. This brings your final price to just $${(product.price * (1 - discountInfo.percent / 100)).toFixed(2)}.`
-        : `The current price at ${product.source} is $${product.price.toFixed(2)}. Check EVPriceHunt regularly for exclusive discount codes and seasonal promotions. Signing up for the retailer's newsletter may also unlock first-time buyer discounts.`
-    },
-    {
-      question: `What is ${product.source}'s return policy?`,
-      answer: `${product.source} offers ${storeInfo.returns} for items in original, unused condition with all packaging intact. To initiate a return, contact ${product.source} customer service with your order number. Refunds are typically processed within 5-7 business days after the return is received.`
-    },
-    {
-      question: `How long does shipping take from ${product.source}?`,
-      answer: `${storeInfo.shipping}. Orders are typically processed within 1-3 business days. Standard delivery takes 5-10 business days depending on your location. Expedited shipping options may be available at checkout. International shipping is available to most countries.`
-    },
-    {
-      question: `What materials is this ${categoryName.toLowerCase()} made from?`,
-      answer: `Materials depend on the product type. Common materials include TPE (floor mats), ABS plastic (trim pieces), tempered glass (screen protectors), and various fabrics. Check the ${product.source} product page for specific materials used in this product.`
-    },
-    {
-      question: `Does this product come with a warranty?`,
-      answer: `Products from ${product.source} are covered by their standard manufacturer warranty, protecting against defects in materials and workmanship. For warranty claims, contact ${product.source} customer service with your order details. ${product.source} has been a trusted Tesla accessories seller since ${storeInfo.established}.`
-    },
-    {
-      question: `How do I care for and maintain this ${categoryName.toLowerCase()}?`,
-      answer: `For best results, follow the manufacturer's care instructions included with your product. Generally, clean with mild soap and water, avoid harsh chemicals, and inspect regularly for wear. Proper maintenance will extend the life of your accessory and keep it looking new.`
-    },
-    {
-      question: `Is this an official Tesla product?`,
-      answer: `This is an aftermarket accessory from ${product.vendor || product.source}, not an official Tesla product. Many aftermarket products are designed specifically for Tesla and can be similar or better than OEM at lower prices.`
-    },
-    {
-      question: `What if this product doesn't fit my Tesla?`,
-      answer: `If the product doesn't fit correctly, ${product.source} offers ${storeInfo.returns}. Before installing, always do a test fit to verify compatibility. If you have fitment issues, contact ${product.source} customer service—they may be able to help troubleshoot or offer an exchange for the correct variant.`
-    }
-  ];
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.answer,
-      },
-    })),
   };
 }
 
@@ -398,17 +305,24 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: 24, marginBottom: 8 }}>Product Not Found</h1>
           <p style={{ color: '#737373' }}>The product you are looking for could not be found.</p>
-          <a href="/" style={{ color: '#E82127', marginTop: 16, display: 'inline-block' }}>
+          <Link href="/" style={{ color: '#E82127', marginTop: 16, display: 'inline-block' }}>
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const productJsonLd = generateProductJsonLd(result.product, slug);
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd(result.product, slug);
-  const faqJsonLd = generateFAQJsonLd(result.product);
+  const { product, similarProducts } = result;
+  const productJsonLd = generateProductJsonLd(product, slug);
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(product, slug);
+
+  const discountInfo = getDiscountInfo(product.url);
+  const affiliateUrl = getAffiliateUrl(product.url);
+  const discountedPrice = discountInfo
+    ? (product.price * (1 - discountInfo.percent / 100)).toFixed(2)
+    : null;
+  const modelNames = getModelNames(product.models);
 
   return (
     <>
@@ -420,11 +334,390 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
-      <ProductPageClient product={result.product} similarProducts={result.similarProducts} />
+
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        {/* Header - SSR */}
+        <header style={{
+          background: '#0a0a0a',
+          padding: '14px 0',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          borderBottom: '1px solid #222'
+        }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Link href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>
+              EV<span style={{ color: '#E82127' }}>PriceHunt</span>
+            </Link>
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+              <Link href="/" style={{ color: '#a3a3a3', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
+                All Products
+              </Link>
+              <Link href="/top-10" style={{ color: '#fbbf24', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
+                Top 10
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Breadcrumb - SSR */}
+        <nav style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 0' }} aria-label="Breadcrumb">
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
+            <div style={{ display: 'flex', gap: 8, fontSize: 13, color: '#6b7280' }}>
+              <Link href="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Home</Link>
+              <span aria-hidden="true">›</span>
+              <Link href={`/category/${product.category}`} style={{ color: '#6b7280', textDecoration: 'none' }}>
+                {formatCategory(product.category)}
+              </Link>
+              <span aria-hidden="true">›</span>
+              <span style={{ color: '#111' }} aria-current="page">{product.title.slice(0, 50)}...</span>
+            </div>
+          </div>
+        </nav>
+
+        {/* Main Content - Critical SEO Section (SSR) */}
+        <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+          <article itemScope itemType="https://schema.org/Product">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 48 }}>
+
+              {/* Left Column - Product Image (SSR) */}
+              <div>
+                <div style={{
+                  background: '#fff',
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  border: '1px solid #e5e7eb',
+                  marginBottom: 24
+                }}>
+                  <div style={{ position: 'relative' }}>
+                    {product.image ? (
+                      <div style={{ aspectRatio: '4/3', background: '#fafafa' }}>
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          itemProp="image"
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 32 }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{
+                        aspectRatio: '4/3',
+                        background: '#f5f5f5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#9ca3af',
+                        fontSize: 16
+                      }}>
+                        No Image Available
+                      </div>
+                    )}
+
+                    {/* Badges */}
+                    <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 8 }}>
+                      {discountInfo && (
+                        <div style={{
+                          background: '#dc2626',
+                          color: '#fff',
+                          padding: '8px 16px',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          fontWeight: 700
+                        }}>
+                          {discountInfo.percent}% OFF
+                        </div>
+                      )}
+                      <div style={{
+                        background: '#0a0a0a',
+                        color: '#fff',
+                        padding: '8px 16px',
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600
+                      }}>
+                        {product.source}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Interactive Tabs Component */}
+                <ProductPageInteractive
+                  product={product}
+                  similarProducts={similarProducts}
+                />
+              </div>
+
+              {/* Right Column - Product Info (SSR) */}
+              <div>
+                <div style={{
+                  background: '#fff',
+                  borderRadius: 16,
+                  border: '1px solid #e5e7eb',
+                  padding: 28,
+                  position: 'sticky',
+                  top: 80
+                }}>
+                  {/* Product Title - Critical for SEO */}
+                  <h1
+                    itemProp="name"
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 700,
+                      lineHeight: 1.3,
+                      marginBottom: 16,
+                      color: '#111'
+                    }}
+                  >
+                    {product.title}
+                  </h1>
+
+                  {/* Model Compatibility */}
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                    marginBottom: 20
+                  }}>
+                    {product.models?.filter(m => m !== 'universal').map(model => (
+                      <span
+                        key={model}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#f3f4f6',
+                          borderRadius: 6,
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: '#374151'
+                        }}
+                      >
+                        {MODEL_NAMES[model] || model}
+                      </span>
+                    ))}
+                    <span style={{
+                      padding: '6px 12px',
+                      background: '#fef3c7',
+                      borderRadius: 6,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: '#92400e'
+                    }}>
+                      {formatCategory(product.category)}
+                    </span>
+                  </div>
+
+                  {/* Price Section - Critical for SEO */}
+                  <div
+                    itemProp="offers"
+                    itemScope
+                    itemType="https://schema.org/Offer"
+                    style={{
+                      background: '#f9fafb',
+                      borderRadius: 12,
+                      padding: 20,
+                      marginBottom: 20
+                    }}
+                  >
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+
+                    {discountInfo ? (
+                      <>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+                          <span
+                            itemProp="price"
+                            content={discountedPrice || ''}
+                            style={{ fontSize: 36, fontWeight: 800, color: '#16a34a' }}
+                          >
+                            ${discountedPrice}
+                          </span>
+                          <span style={{ fontSize: 20, color: '#9ca3af', textDecoration: 'line-through' }}>
+                            ${product.price.toFixed(2)}
+                          </span>
+                        </div>
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          background: '#dcfce7',
+                          padding: '8px 14px',
+                          borderRadius: 8
+                        }}>
+                          <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 500 }}>
+                            Use code:
+                          </span>
+                          <span style={{
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: '#15803d',
+                            fontFamily: 'monospace',
+                            letterSpacing: '0.05em'
+                          }}>
+                            {discountInfo.code}
+                          </span>
+                          <span style={{ fontSize: 13, color: '#16a34a' }}>
+                            for {discountInfo.percent}% off
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <span
+                        itemProp="price"
+                        content={product.price.toFixed(2)}
+                        style={{ fontSize: 36, fontWeight: 800, color: '#111' }}
+                      >
+                        ${product.price.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* CTA Button */}
+                  <a
+                    href={affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 10,
+                      width: '100%',
+                      padding: '16px 24px',
+                      background: '#E82127',
+                      color: '#fff',
+                      borderRadius: 12,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      marginBottom: 16
+                    }}
+                  >
+                    Buy at {product.source}
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </a>
+
+                  {/* Product Description - Important for SEO */}
+                  <div itemProp="description" style={{ marginTop: 20 }}>
+                    <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                      {formatCategory(product.category)} designed for Tesla {modelNames}.
+                      Available from {product.source} with fast shipping and easy returns.
+                      {discountInfo && ` Save ${discountInfo.percent}% with exclusive discount code ${discountInfo.code}.`}
+                    </p>
+                  </div>
+
+                  {/* Store Info */}
+                  <div style={{
+                    marginTop: 24,
+                    paddingTop: 20,
+                    borderTop: '1px solid #e5e7eb'
+                  }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: '#111' }}>
+                      Sold by {product.source}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, color: '#6b7280' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: '#16a34a' }}>✓</span>
+                        Free shipping on most orders
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: '#16a34a' }}>✓</span>
+                        30-day return policy
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: '#16a34a' }}>✓</span>
+                        Secure checkout
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Similar Products Section (SSR) */}
+            {similarProducts.length > 0 && (
+              <section style={{ marginTop: 64 }}>
+                <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, color: '#111' }}>
+                  Similar Products
+                </h2>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                  gap: 16
+                }}>
+                  {similarProducts.slice(0, 6).map((p, idx) => {
+                    const pDiscount = getDiscountInfo(p.url);
+                    return (
+                      <Link
+                        key={idx}
+                        href={`/product/${generateSlug(p.title)}`}
+                        style={{
+                          background: '#fff',
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          border: '1px solid #e5e7eb',
+                          textDecoration: 'none',
+                          color: 'inherit'
+                        }}
+                      >
+                        {p.image && (
+                          <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
+                            <img
+                              src={p.image}
+                              alt={p.title}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              loading="lazy"
+                            />
+                            {pDiscount && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 8,
+                                left: 8,
+                                background: '#16a34a',
+                                color: '#fff',
+                                padding: '4px 8px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 700
+                              }}>
+                                {pDiscount.percent}% OFF
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <div style={{ padding: 14 }}>
+                          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6 }}>
+                            {p.source}
+                          </div>
+                          <h3 style={{
+                            fontSize: 14,
+                            fontWeight: 500,
+                            color: '#111',
+                            marginBottom: 8,
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}>
+                            {p.title}
+                          </h3>
+                          <div style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>
+                            ${p.price.toFixed(0)}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+          </article>
+        </main>
+
+        <Footer />
+      </div>
     </>
   );
 }

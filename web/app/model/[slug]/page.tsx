@@ -1,16 +1,19 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import ModelPageClient from './ModelPageClient';
-import { TESLA_MODELS, SITE_NAME, SITE_URL } from '@/lib/constants';
+import Link from 'next/link';
+import ModelPageInteractive from './ModelPageInteractive';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { TESLA_MODELS, SITE_NAME, SITE_URL, CATEGORIES, generateSlug } from '@/lib/constants';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { isAffiliatePartner } from '@/lib/affiliate';
+import { isAffiliatePartner, getDiscountInfo } from '@/lib/affiliate';
+import { Product } from '@/lib/types';
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-import { Product } from '@/lib/types';
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -78,8 +81,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const modelSeo = MODEL_SEO[slug] || { year: '2020+', description: '', popularAccessories: [] };
-
-  // SEO-optimized title with year
   const title = `Best Tesla ${model.name} Accessories ${modelSeo.year} | Compare & Save`;
   const description = `Shop ${modelSeo.popularAccessories.slice(0, 3).join(', ').toLowerCase()}, and 500+ more accessories for Tesla ${model.name}. Compare prices and save up to 20% with exclusive discount codes.`;
 
@@ -91,12 +92,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `Tesla ${model.name} accessories ${modelSeo.year.split('-')[0]}`,
       `best ${model.name} floor mats`,
       `${model.name} screen protector`,
-      `${model.name} charging accessories`,
-      `${model.name} interior accessories`,
-      `${model.name} exterior accessories`,
       'Tesla accessories',
       'Tesla discount codes',
-      'EV accessories',
     ],
     openGraph: {
       title,
@@ -122,29 +119,14 @@ function generateBreadcrumbJsonLd(model: { id: string; name: string }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Tesla Models',
-        item: `${SITE_URL}/model`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: `${model.name} Accessories`,
-        item: `${SITE_URL}/model/${model.id}`,
-      },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Tesla Models', item: `${SITE_URL}/model` },
+      { '@type': 'ListItem', position: 3, name: `${model.name} Accessories`, item: `${SITE_URL}/model/${model.id}` },
     ],
   };
 }
 
-// Generate FAQ JSON-LD for model pages
+// Generate FAQ JSON-LD
 function generateModelFAQJsonLd(model: { id: string; name: string }, productCount: number, lowestPrice: number) {
   const modelSeo = MODEL_SEO[model.id] || MODEL_SEO['model-y'];
 
@@ -155,19 +137,11 @@ function generateModelFAQJsonLd(model: { id: string; name: string }, productCoun
     },
     {
       question: `What year Tesla ${model.name} are these accessories for?`,
-      answer: `Our ${model.name} accessories are compatible with ${modelSeo.year} model years. Always verify compatibility with your specific production date before purchasing. You can find your build date on the door jamb sticker or in your Tesla app.`
+      answer: `Our ${model.name} accessories are compatible with ${modelSeo.year} model years. Always verify compatibility with your specific production date.`
     },
     {
       question: `How much do Tesla ${model.name} accessories cost?`,
-      answer: `Tesla ${model.name} accessories start from $${lowestPrice.toFixed(0)}. We compare ${productCount}+ products from trusted retailers to help you find the best prices. Many items have exclusive discount codes that save you up to 20%.`
-    },
-    {
-      question: `Are aftermarket accessories as good as Tesla OEM for ${model.name}?`,
-      answer: `Many aftermarket ${model.name} accessories are as good as or better than Tesla OEM. Brands like Tesmanian, Tesery, and 3D MAXpider make products specifically for ${model.name}. They often use similar or better materials at lower prices.`
-    },
-    {
-      question: `How do I find discount codes for Tesla ${model.name} accessories?`,
-      answer: `We partner with top Tesla accessory stores to offer exclusive discount codes. Products with available discounts show a green badge with the savings percentage. Simply use the code shown at checkout to save up to 20% on your purchase.`
+      answer: `Tesla ${model.name} accessories start from $${lowestPrice.toFixed(0)}. We compare ${productCount}+ products from trusted retailers.`
     },
   ];
 
@@ -177,9 +151,32 @@ function generateModelFAQJsonLd(model: { id: string; name: string }, productCoun
     mainEntity: faqs.map(faq => ({
       '@type': 'Question',
       name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.answer,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  };
+}
+
+// Generate ItemList JSON-LD
+function generateItemListJsonLd(products: Product[], modelName: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Accessories for Tesla ${modelName}`,
+    numberOfItems: products.length,
+    itemListElement: products.slice(0, 24).map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Product',
+        name: product.title,
+        image: product.image,
+        offers: {
+          '@type': 'Offer',
+          price: product.price,
+          priceCurrency: 'USD',
+          availability: 'https://schema.org/InStock',
+        },
+        url: `${SITE_URL}/product/${generateSlug(product.title)}`,
       },
     })),
   };
@@ -195,17 +192,40 @@ export default async function ModelPage({ params }: Props) {
 
   const products = await getProducts();
 
-  // Calculate stats for FAQ
+  // Filter products for this model
   const modelProducts = products.filter(p =>
     p.models?.includes(model.id) && isAffiliatePartner(p.url)
   );
+
+  // Calculate stats
   const productCount = modelProducts.length;
   const lowestPrice = modelProducts.length > 0
     ? Math.min(...modelProducts.map(p => p.price))
     : 30;
+  const discountedCount = modelProducts.filter(p => getDiscountInfo(p.url) !== null).length;
+  const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
+  const totalStores = new Set(partnerProducts.map(p => p.source)).size;
 
+  // Get first 24 products sorted by price for SSR
+  const initialProducts = [...modelProducts]
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 24);
+
+  // Get available categories for this model
+  const availableCategories = CATEGORIES.filter(c =>
+    modelProducts.some(p => p.category === c.id)
+  ).slice(0, 6);
+
+  const modelSeo = MODEL_SEO[model.id] || MODEL_SEO['model-y'];
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(model);
   const faqJsonLd = generateModelFAQJsonLd(model, productCount, lowestPrice);
+  const itemListJsonLd = generateItemListJsonLd(initialProducts, model.name);
+
+  const stats = {
+    totalProducts: partnerProducts.length,
+    totalStores,
+    discountedCount,
+  };
 
   return (
     <>
@@ -217,10 +237,189 @@ export default async function ModelPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <ModelPageClient
-        model={model}
-        initialProducts={products}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
+
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+        <Header stats={stats} />
+
+        <main style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px' }}>
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Tesla Models', href: '/model' },
+              { label: model.name },
+            ]}
+          />
+
+          {/* Hero Section - SSR for SEO */}
+          <section style={{
+            background: 'linear-gradient(135deg, #E82127 0%, #b91c1c 100%)',
+            borderRadius: 16,
+            padding: '48px',
+            marginBottom: 32,
+            color: '#fff',
+          }}>
+            <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
+              Tesla {model.name} Accessories
+            </h1>
+            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.9)', maxWidth: 600, lineHeight: 1.6 }}>
+              Find the best accessories specifically designed for your Tesla {model.name}.
+              Compare prices and get exclusive discount codes.
+            </p>
+            <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
+              <div style={{ background: 'rgba(255,255,255,0.2)', padding: '12px 20px', borderRadius: 8 }}>
+                <div style={{ fontSize: 24, fontWeight: 700 }}>{productCount}</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>Products</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.2)', padding: '12px 20px', borderRadius: 8 }}>
+                <div style={{ fontSize: 24, fontWeight: 700 }}>{discountedCount}</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>On Sale</div>
+              </div>
+            </div>
+          </section>
+
+          {/* Quick Category Links - SSR */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: 32,
+          }}>
+            {availableCategories.map(cat => (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.id}?model=${model.id}`}
+                style={{
+                  padding: '10px 20px',
+                  background: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: '#374151',
+                  textDecoration: 'none',
+                }}
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* SEO Content Section - SSR */}
+          <section style={{
+            background: '#fff',
+            borderRadius: 12,
+            padding: 24,
+            marginBottom: 24,
+            border: '1px solid #e5e7eb'
+          }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12, color: '#111' }}>
+              About Tesla {model.name} Accessories ({modelSeo.year})
+            </h2>
+            <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, marginBottom: 16 }}>
+              {modelSeo.description}
+            </p>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 10, color: '#111' }}>
+              Popular Accessories
+            </h3>
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
+              {modelSeo.popularAccessories.map((acc, i) => (
+                <li key={i} style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7, marginBottom: 6 }}>
+                  {acc}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* First 24 Products - SSR for SEO */}
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: '#111' }}>
+              Top {model.name} Accessories (Lowest Price First)
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: 16
+            }}>
+              {initialProducts.map((product, idx) => {
+                const discount = getDiscountInfo(product.url);
+                return (
+                  <Link
+                    key={idx}
+                    href={`/product/${generateSlug(product.title)}`}
+                    style={{
+                      background: '#fff',
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      border: '1px solid #e5e7eb',
+                      textDecoration: 'none',
+                      color: 'inherit'
+                    }}
+                  >
+                    {product.image && (
+                      <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading={idx < 8 ? 'eager' : 'lazy'}
+                        />
+                        {discount && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 8,
+                            left: 8,
+                            background: '#16a34a',
+                            color: '#fff',
+                            padding: '4px 8px',
+                            borderRadius: 4,
+                            fontSize: 11,
+                            fontWeight: 700
+                          }}>
+                            {discount.percent}% OFF
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div style={{ padding: 14 }}>
+                      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6 }}>
+                        {product.source}
+                      </div>
+                      <h3 style={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: '#111',
+                        marginBottom: 8,
+                        lineHeight: 1.4,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}>
+                        {product.title}
+                      </h3>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>
+                        ${product.price.toFixed(0)}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Interactive Filters and Full Product List */}
+          <ModelPageInteractive
+            model={model}
+            initialProducts={products}
+          />
+        </main>
+
+        <Footer />
+      </div>
     </>
   );
 }

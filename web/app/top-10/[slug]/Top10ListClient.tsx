@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -163,34 +163,24 @@ interface TopList {
 
 interface Top10ListClientProps {
   list: TopList;
+  initialProducts: Product[];
 }
 
-export default function Top10ListClient({ list }: Top10ListClientProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Top10ListClient({ list, initialProducts }: Top10ListClientProps) {
+  // Use initial products from server - no loading state needed
+  const products = initialProducts;
 
   // Check if this is a curated list
   const isCuratedMattressList = list.id === 'mattress';
 
-  useEffect(() => {
-    // Skip API fetch for curated mattress list
-    if (isCuratedMattressList) {
-      setLoading(false);
-      return;
-    }
+  // Helper to get discount for curated products
+  const getCuratedDiscount = (source: string) => {
+    return MATTRESS_DISCOUNTS[source] || null;
+  };
 
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [isCuratedMattressList]);
-
-  const getTopProducts = (listData: TopList): Product[] => {
+  const topProducts = useMemo(() => {
     // Return curated list for mattress
-    if (listData.id === 'mattress') {
+    if (list.id === 'mattress') {
       return CURATED_MATTRESS_PRODUCTS;
     }
 
@@ -199,12 +189,12 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
     // Filter by keywords
     filtered = filtered.filter(p => {
       const titleLower = p.title.toLowerCase();
-      return listData.keywords.some(kw => titleLower.includes(kw.toLowerCase()));
+      return list.keywords.some(kw => titleLower.includes(kw.toLowerCase()));
     });
 
     // Filter by models if specified
-    if (listData.models && listData.models.length > 0) {
-      filtered = filtered.filter(p => p.models?.some(m => listData.models!.includes(m)));
+    if (list.models && list.models.length > 0) {
+      filtered = filtered.filter(p => p.models?.some(m => list.models!.includes(m)));
     }
 
     // Sort by: has discount first, then by price
@@ -216,14 +206,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
     });
 
     return filtered.slice(0, 10);
-  };
-
-  // Helper to get discount for curated products
-  const getCuratedDiscount = (source: string) => {
-    return MATTRESS_DISCOUNTS[source] || null;
-  };
-
-  const topProducts = useMemo(() => getTopProducts(list), [products, list, isCuratedMattressList]);
+  }, [products, list]);
 
   const stats = useMemo(() => {
     const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
@@ -235,18 +218,6 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
       discountedCount: discounted.length,
     };
   }, [products]);
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: 48, height: 48, border: '3px solid #e5e7eb', borderTopColor: '#E82127', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#6b7280', fontSize: 15 }}>Loading top products...</p>
-        </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
@@ -580,7 +551,7 @@ export default function Top10ListClient({ list }: Top10ListClientProps) {
                 About {list.title}
               </h2>
               <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, marginBottom: 16 }}>
-                {list.description} We've carefully evaluated dozens of products to bring you the top 10 best options
+                {list.description} We&apos;ve carefully evaluated dozens of products to bring you the top 10 best options
                 available in 2026. We rank based on customer reviews, materials,
                 compatibility across Tesla models, and overall value for money.
               </p>

@@ -49,7 +49,7 @@ export default function NotFound() {
           marginBottom: 32,
           lineHeight: 1.6,
         }}>
-          The page you're looking for doesn't exist or has been moved.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
           Try browsing our Tesla accessories or return to the homepage.
         </p>
 

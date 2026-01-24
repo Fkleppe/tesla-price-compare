@@ -208,7 +208,7 @@ export default function AboutPage() {
                 <li>Browse our catalog or filter by your Tesla model</li>
                 <li>Compare prices across multiple stores</li>
                 <li>Find products with discount codes for extra savings</li>
-                <li>Click "Visit" to go directly to the store</li>
+                <li>Click &quot;Visit&quot; to go directly to the store</li>
                 <li>Apply the discount code at checkout</li>
               </ol>
             </section>

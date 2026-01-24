@@ -120,7 +120,7 @@ export default function StoresPage() {
             Our Partner Stores
           </h1>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
-            We've partnered with the best Tesla accessory retailers to bring you exclusive discount codes
+            We&apos;ve partnered with the best Tesla accessory retailers to bring you exclusive discount codes
             and the lowest prices.
           </p>
         </section>
@@ -272,7 +272,7 @@ export default function StoresPage() {
                 Exclusive Discounts
               </h3>
               <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
-                Get access to discount codes you won't find anywhere else, saving up to 20% on your purchase.
+                Get access to discount codes you won&apos;t find anywhere else, saving up to 20% on your purchase.
               </p>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -314,7 +314,7 @@ export default function StoresPage() {
                 Best Prices
               </h3>
               <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
-                Compare prices across all partner stores to ensure you're getting the best deal possible.
+                Compare prices across all partner stores to ensure you&apos;re getting the best deal possible.
               </p>
             </div>
           </div>

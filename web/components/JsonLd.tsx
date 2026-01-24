@@ -1,6 +1,9 @@
 import { Product } from '@/lib/types';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 
+// Pre-compute priceValidUntil date (30 days from build time)
+const PRICE_VALID_UNTIL = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
 interface ProductJsonLdProps {
   product: Product;
   discountPercent?: number;
@@ -26,7 +29,7 @@ export function ProductJsonLd({ product, discountPercent }: ProductJsonLdProps) 
       url: product.url,
       priceCurrency: product.currency || 'USD',
       price: discountedPrice.toFixed(2),
-      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      priceValidUntil: PRICE_VALID_UNTIL,
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',

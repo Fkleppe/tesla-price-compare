@@ -1,0 +1,8 @@
+# Ignore large data files that crash Claude sessions
+data/*.json
+web/data/*.json
+
+# Standard ignores
+node_modules/
+.next/
+.git/
