@@ -51,20 +51,16 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           <h3 className="product-title">{product.title}</h3>
 
           <div className="product-price">
-            {discount ? (
-              <>
-                <span className="price-discounted">{formatPrice(discountedPrice)}</span>
-                <span className="price-original">{formatPrice(product.price)}</span>
-              </>
-            ) : (
-              <span className="price-current">{formatPrice(product.price)}</span>
+            <span className="price-current">{formatPrice(product.price)}</span>
+            {discount && (
+              <span className="price-with-code">{formatPrice(discountedPrice)} with code</span>
             )}
           </div>
 
           {discount && (
             <div className="discount-code">
-              <span className="discount-label">Use code:</span>
               <span className="discount-value">{discount.code}</span>
+              <span className="discount-percent">-{discount.percent}%</span>
             </div>
           )}
         </div>
@@ -160,42 +156,44 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
         }
         .product-price {
           display: flex;
-          align-items: baseline;
-          gap: 8px;
+          flex-direction: column;
+          gap: 2px;
         }
         .price-current {
           font-size: 18px;
           font-weight: 700;
           color: #111;
         }
-        .price-discounted {
-          font-size: 18px;
-          font-weight: 700;
+        .price-with-code {
+          font-size: 14px;
+          font-weight: 600;
           color: #16a34a;
-        }
-        .price-original {
-          font-size: 13px;
-          color: #9ca3af;
-          text-decoration: line-through;
         }
         .discount-code {
           margin-top: 8px;
-          padding: 6px 10px;
+          padding: 8px 10px;
           background: #f0fdf4;
+          border: 1px dashed #86efac;
           border-radius: 6px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-        .discount-label {
-          font-size: 11px;
-          color: #16a34a;
+          gap: 8px;
         }
         .discount-value {
-          font-size: 12px;
+          font-size: 14px;
           font-weight: 700;
           color: #15803d;
           font-family: monospace;
+          letter-spacing: 0.5px;
+        }
+        .discount-percent {
+          font-size: 12px;
+          font-weight: 700;
+          color: #fff;
+          background: #16a34a;
+          padding: 2px 6px;
+          border-radius: 4px;
         }
         .visit-button-container {
           padding: 0 14px 14px;

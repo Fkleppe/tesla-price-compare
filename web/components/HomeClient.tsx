@@ -550,21 +550,17 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                             </div>
                             <h3 className="product-title">{p.title}</h3>
                             <div className="product-price">
-                              {discount ? (
-                                <>
-                                  <span className="price-discounted">
-                                    ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
-                                  </span>
-                                  <span className="price-original">${p.price.toFixed(0)}</span>
-                                </>
-                              ) : (
-                                <span className="price-regular">${p.price.toFixed(0)}</span>
+                              <span className="price-regular">${p.price.toFixed(0)}</span>
+                              {discount && (
+                                <span className="price-with-code">
+                                  ${(p.price * (1 - discount.percent / 100)).toFixed(0)} with code
+                                </span>
                               )}
                             </div>
                             {discount && (
                               <div className="discount-code">
-                                <span>Use code:</span>
                                 <span className="code">{discount.code}</span>
+                                <span className="discount-percent">-{discount.percent}%</span>
                               </div>
                             )}
                           </div>
@@ -1302,28 +1298,42 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           text-decoration: line-through;
         }
         .price-regular {
-          font-size: 16px;
+          font-size: 18px;
           font-weight: 700;
           color: #111;
         }
+        .price-with-code {
+          display: block;
+          font-size: 14px;
+          font-weight: 600;
+          color: #16a34a;
+          margin-top: 2px;
+        }
         .discount-code {
           margin-top: 8px;
-          padding: 6px 10px;
+          padding: 8px 10px;
           background: #f0fdf4;
+          border: 1px dashed #86efac;
           border-radius: 6px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-        .discount-code span:first-child {
-          font-size: 11px;
-          color: #16a34a;
+          gap: 8px;
         }
         .discount-code .code {
-          font-size: 12px;
+          font-size: 14px;
           font-weight: 700;
           color: #15803d;
           font-family: monospace;
+          letter-spacing: 0.5px;
+        }
+        .discount-code .discount-percent {
+          font-size: 12px;
+          font-weight: 700;
+          color: #fff;
+          background: #16a34a;
+          padding: 2px 6px;
+          border-radius: 4px;
         }
         .product-action {
           padding: 0 12px 12px;
