@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAffiliateUrl, getDiscountInfo, isAffiliatePartner } from '../lib/affiliate';
 import { Product, ProductMatch, PaginatedResponse, PaginationMeta } from '../lib/types';
 import { useProducts } from '../lib/hooks/useProducts';
@@ -630,8 +631,15 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                         >
                           <div style={{ position: 'relative' }}>
                             {p.image && (
-                              <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
-                                <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                              <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden', position: 'relative' }}>
+                                <Image
+                                  src={p.image}
+                                  alt={p.title}
+                                  fill
+                                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                  style={{ objectFit: 'cover' }}
+                                  loading={idx < 12 ? 'eager' : 'lazy'}
+                                />
                               </div>
                             )}
                             {discount && (
@@ -834,8 +842,14 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                 >
                   {match.products[0]?.image && (
                     <div style={{ aspectRatio: '16/10', background: '#f9fafb', overflow: 'hidden', position: 'relative' }}>
-                      <img src={match.products[0].image} alt={match.products[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', top: 8, right: 8, background: '#16a34a', color: '#fff', padding: '6px 12px', borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
+                      <Image
+                        src={match.products[0].image}
+                        alt={match.products[0].title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        style={{ objectFit: 'cover' }}
+                      />
+                      <div style={{ position: 'absolute', top: 8, right: 8, background: '#16a34a', color: '#fff', padding: '6px 12px', borderRadius: 6, fontSize: 13, fontWeight: 700, zIndex: 1 }}>
                         Save {match.savingsPercent}%
                       </div>
                     </div>
@@ -899,8 +913,8 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                 return (
                   <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', background: i === 0 ? '#f0fdf4' : '#f9fafb', borderRadius: 10, marginBottom: 10, border: i === 0 ? '2px solid #86efac' : '1px solid #e5e7eb', alignItems: 'center' }}>
                     {p.image && (
-                      <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#fff', border: '1px solid #e5e7eb' }}>
-                        <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#fff', border: '1px solid #e5e7eb', position: 'relative' }}>
+                        <Image src={p.image} alt={p.title} fill sizes="64px" style={{ objectFit: 'cover' }} />
                       </div>
                     )}
                     <div style={{ flex: 1, minWidth: 0 }}>

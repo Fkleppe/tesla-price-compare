@@ -35,8 +35,54 @@ export default function Home() {
     hasMore: totalPages > 1,
   };
 
+  // JSON-LD structured data for SEO
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Featured Tesla Accessories',
+    numberOfItems: initialProducts.length,
+    itemListElement: initialProducts.slice(0, 24).map((p, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'Product',
+        name: p.title,
+        image: p.image,
+        offers: {
+          '@type': 'Offer',
+          price: p.price.toFixed(2),
+          priceCurrency: 'USD',
+          availability: 'https://schema.org/InStock',
+        },
+      },
+    })),
+  };
+
   return (
     <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+
       {/* SEO Hero Section - Server rendered FIRST for Google */}
       <section style={{ background: '#fff', padding: '32px 24px 0', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
