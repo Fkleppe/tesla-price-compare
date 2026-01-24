@@ -1,6 +1,6 @@
 'use client';
 
-import useSWR from 'swr';
+import useSWR, { preload } from 'swr';
 import { useState, useEffect, useMemo } from 'react';
 import { Product, PaginatedResponse, PaginationMeta, SortOption } from '../types';
 
@@ -123,6 +123,18 @@ export function useProducts(
       dedupingInterval: 2000,
     }
   );
+
+  // Prefetch next page for instant pagination
+  useEffect(() => {
+    if (data?.meta?.hasMore) {
+      const nextPageQuery = buildQueryString({
+        ...params,
+        page: params.page + 1,
+        search: debouncedSearch,
+      });
+      preload(`/api/products?${nextPageQuery}`, fetcher);
+    }
+  }, [data?.meta?.hasMore, params.page, debouncedSearch]);
 
   return {
     products: data?.products || [],

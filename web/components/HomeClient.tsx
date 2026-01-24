@@ -85,7 +85,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
   }), [initialProducts, initialMeta]);
 
   // Use SWR hook for server-side filtering
-  const { products, meta, isLoading, isValidating } = useProducts(
+  const { products, meta, isLoading, isValidating, error } = useProducts(
     {
       page,
       limit: ITEMS_PER_PAGE,
@@ -323,23 +323,29 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               {isValidating && (
-                <div style={{
-                  position: 'absolute',
-                  right: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 16,
-                  height: 16,
-                  border: '2px solid #e5e7eb',
-                  borderTopColor: '#E82127',
-                  borderRadius: '50%',
-                  animation: 'spin 0.8s linear infinite',
-                }} />
+                <div
+                  role="status"
+                  aria-label="Loading products"
+                  style={{
+                    position: 'absolute',
+                    right: 14,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: 16,
+                    height: 16,
+                    border: '2px solid #e5e7eb',
+                    borderTopColor: '#E82127',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }}
+                />
               )}
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
+              aria-expanded={showFilters}
+              aria-controls="filter-sidebar"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -396,7 +402,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
       <div style={{ maxWidth: 1440, margin: '0 auto', padding: '24px', display: 'flex', gap: 24 }}>
         {/* Sidebar Filters */}
         {showFilters && (
-          <aside style={{ width: 280, flexShrink: 0 }}>
+          <aside id="filter-sidebar" style={{ width: 280, flexShrink: 0 }}>
             <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', position: 'sticky', top: 80, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
               {/* Filter Header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -562,7 +568,37 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           {/* Products Grid */}
           {viewMode === 'products' && (
             <>
-              {showLoadingState ? (
+              {error ? (
+                <div style={{
+                  padding: 48,
+                  textAlign: 'center',
+                  background: '#fef2f2',
+                  borderRadius: 12,
+                  border: '1px solid #fecaca'
+                }}>
+                  <h3 style={{ color: '#dc2626', marginBottom: 8, fontSize: 18, fontWeight: 600 }}>
+                    Failed to load products
+                  </h3>
+                  <p style={{ color: '#991b1b', marginBottom: 16, fontSize: 14 }}>
+                    Please try refreshing the page.
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                      padding: '10px 20px',
+                      background: '#E82127',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      fontSize: 14,
+                      fontWeight: 500
+                    }}
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+              ) : showLoadingState ? (
                 <ProductSkeleton count={ITEMS_PER_PAGE} showFilters={showFilters} />
               ) : (
                 <div style={{
