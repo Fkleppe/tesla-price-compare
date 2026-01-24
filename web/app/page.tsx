@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getProducts, getMatches, getProductStats } from '../lib/data';
+import { getProducts, getMatches, getProductStats, getInitialProducts } from '../lib/data';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '../lib/constants';
 import HomeClient from '../components/HomeClient';
 import Footer from '../components/Footer';
@@ -13,64 +13,83 @@ export const metadata: Metadata = {
   },
 };
 
+const INITIAL_LIMIT = 48;
+
 export default function Home() {
   // Server-side data fetching
-  const products = getProducts();
+  const allProducts = getProducts();
   const matches = getMatches();
-  const stats = getProductStats(products, matches);
+  const stats = getProductStats(allProducts, matches);
+
+  // Only pass first 48 products for SSR (not all 10,000+)
+  const initialProducts = getInitialProducts(allProducts, INITIAL_LIMIT);
+
+  // Calculate initial meta for pagination
+  const totalProducts = allProducts.length;
+  const totalPages = Math.ceil(totalProducts / INITIAL_LIMIT);
+  const initialMeta = {
+    total: totalProducts,
+    page: 1,
+    limit: INITIAL_LIMIT,
+    totalPages,
+    hasMore: totalPages > 1,
+  };
 
   return (
     <>
-      {/* Interactive client component with all the filters/search */}
-      <HomeClient
-        initialProducts={products}
-        initialMatches={matches}
-        stats={stats}
-      />
-
-      {/* SEO Content Section - Server rendered for Google */}
-      <section style={{ background: '#fff', padding: '64px 24px', borderTop: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111', marginBottom: 16, textAlign: 'center' }}>
+      {/* SEO Hero Section - Server rendered FIRST for Google */}
+      <section style={{ background: '#fff', padding: '32px 24px 0', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: 36, fontWeight: 800, color: '#111', marginBottom: 16 }}>
             Compare Tesla Accessory Prices in {new Date().getFullYear()}
           </h1>
+          <p style={{ fontSize: 18, color: '#4b5563', lineHeight: 1.7, maxWidth: 800, margin: '0 auto 24px' }}>
+            Find the best deals on Tesla accessories from {stats.totalStores}+ verified stores.
+            Compare prices on floor mats, screen protectors, charging accessories for Model 3, Model Y, Model S, Model X, and Cybertruck.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 32, padding: '16px 0 32px', flexWrap: 'wrap' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#E82127' }}>{stats.totalProducts.toLocaleString()}+</div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}>Products</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#E82127' }}>{stats.totalStores}</div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}>Stores</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#16a34a' }}>20%</div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}>Max Savings</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive client component with all the filters/search */}
+      <HomeClient
+        initialProducts={initialProducts}
+        initialMatches={matches}
+        stats={stats}
+        initialMeta={initialMeta}
+      />
+
+      {/* Additional SEO Content Section - Server rendered for Google */}
+      <section style={{ background: '#fff', padding: '64px 24px', borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: '#111', marginBottom: 16, textAlign: 'center' }}>
+            Why Compare Tesla Accessory Prices?
+          </h2>
           <p style={{ fontSize: 17, color: '#4b5563', lineHeight: 1.8, textAlign: 'center', maxWidth: 800, margin: '0 auto 48px' }}>
             EVPriceHunt helps you find the best deals on Tesla and EV accessories from verified retailers.
             Compare prices across {stats.totalStores}+ stores, find exclusive discount codes, and save up to 20% on floor mats,
             screen protectors, charging accessories, and more for Model 3, Model Y, Model S, Model X, and Cybertruck.
           </p>
 
-          {/* Stats banner - shows real numbers */}
-          <div style={{ background: '#0a0a0a', padding: 40, borderRadius: 16, color: '#fff', marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, textAlign: 'center' }}>
-              Why Compare Tesla Accessory Prices?
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>{stats.totalProducts.toLocaleString()}+</div>
-                <div style={{ fontSize: 14, color: '#9ca3af' }}>Tesla Accessories</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>{stats.totalStores}</div>
-                <div style={{ fontSize: 14, color: '#9ca3af' }}>Verified Stores</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#16a34a', marginBottom: 8 }}>20%</div>
-                <div style={{ fontSize: 14, color: '#9ca3af' }}>Max Discount</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#E82127', marginBottom: 8 }}>7</div>
-                <div style={{ fontSize: 14, color: '#9ca3af' }}>Tesla Models</div>
-              </div>
-            </div>
-          </div>
-
           {/* Model sections */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 32, marginBottom: 48 }}>
             <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
                 Tesla Model 3 & Highland Accessories
-              </h2>
+              </h3>
               <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
                 Compare floor mats, 9H tempered glass screen protectors, center console wraps, and chargers
                 for Model 3. Highland owners (2024+) can find accessories designed for the refreshed interior.
@@ -81,9 +100,9 @@ export default function Home() {
             </div>
 
             <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
                 Tesla Model Y & Juniper Accessories
-              </h2>
+              </h3>
               <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
                 Compare 7-piece floor mat sets, cargo liners, sunshade kits, and camping gear for Model Y.
                 Model Y Juniper 2025+ owners can find accessories made for the refreshed design.
@@ -94,13 +113,13 @@ export default function Home() {
             </div>
 
             <div style={{ background: '#f9fafb', padding: 32, borderRadius: 12 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 12 }}>
                 Cybertruck Accessories 2024-{new Date().getFullYear()}
-              </h2>
+              </h3>
               <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
-                Tesla's revolutionary pickup truck has a growing accessory ecosystem. Find bed liners,
+                Tesla&apos;s revolutionary pickup truck has a growing accessory ecosystem. Find bed liners,
                 floor mats, tonneau covers, frunk organizers, and exterior protection.
-                All accessories are designed specifically for Cybertruck's unique dimensions.
+                All accessories are designed specifically for Cybertruck&apos;s unique dimensions.
               </p>
               <Link href="/model/cybertruck" style={{ color: '#E82127', textDecoration: 'none', fontSize: 14, fontWeight: 600, display: 'inline-block', marginTop: 12 }}>
                 Shop Cybertruck Accessories →
@@ -148,7 +167,7 @@ export default function Home() {
               Featured Tesla Accessories
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
-              {products.slice(0, 24).map((p, idx) => (
+              {initialProducts.slice(0, 24).map((p, idx) => (
                 <article
                   key={idx}
                   style={{

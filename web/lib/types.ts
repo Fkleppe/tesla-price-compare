@@ -72,3 +72,16 @@ export interface SEOMetadata {
     type?: string;
   };
 }
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  products: T[];
+  meta: PaginationMeta;
+}

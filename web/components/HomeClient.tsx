@@ -3,9 +3,9 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { getAffiliateUrl, getDiscountInfo, isAffiliatePartner } from '../lib/affiliate';
-import { Product, ProductMatch } from '../lib/types';
-import Header from './Header';
-import Footer from './Footer';
+import { Product, ProductMatch, PaginatedResponse, PaginationMeta } from '../lib/types';
+import { useProducts } from '../lib/hooks/useProducts';
+import ProductSkeleton from './ProductSkeleton';
 
 interface HomeClientProps {
   initialProducts: Product[];
@@ -19,6 +19,7 @@ interface HomeClientProps {
     categories: string[];
     sources: string[];
   };
+  initialMeta: PaginationMeta;
 }
 
 const MODEL_LABELS: Record<string, string> = {
@@ -60,7 +61,7 @@ const TOP_10_CATEGORIES = [
 
 const ITEMS_PER_PAGE = 48;
 
-export default function HomeClient({ initialProducts, initialMatches, stats }: HomeClientProps) {
+export default function HomeClient({ initialProducts, initialMatches, stats, initialMeta }: HomeClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('products');
   const [selectedMatch, setSelectedMatch] = useState<ProductMatch | null>(null);
   const [showFilters, setShowFilters] = useState(true);
@@ -77,51 +78,35 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [page, setPage] = useState(1);
 
-  // Calculate discounted count
+  // Build fallback data for SWR
+  const fallbackData: PaginatedResponse<Product> = useMemo(() => ({
+    products: initialProducts,
+    meta: initialMeta,
+  }), [initialProducts, initialMeta]);
+
+  // Use SWR hook for server-side filtering
+  const { products, meta, isLoading, isValidating } = useProducts(
+    {
+      page,
+      limit: ITEMS_PER_PAGE,
+      models: selectedModels,
+      categories: selectedCategories,
+      sources: selectedSources,
+      priceMin,
+      priceMax,
+      search: searchQuery,
+      sort: sortBy,
+      onlyDiscounted,
+    },
+    fallbackData
+  );
+
+  // Calculate discounted count from stats (approximation)
   const discountedCount = useMemo(() => {
     return initialProducts.filter(p => getDiscountInfo(p.url) !== null).length;
   }, [initialProducts]);
 
-  // Filtered products
-  const filteredProducts = useMemo(() => {
-    let filtered = initialProducts;
-
-    if (selectedModels.length > 0) {
-      filtered = filtered.filter(p => p.models?.some(m => selectedModels.includes(m)));
-    }
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(p => selectedCategories.includes(p.category));
-    }
-    if (selectedSources.length > 0) {
-      filtered = filtered.filter(p => selectedSources.includes(p.source));
-    }
-    filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
-    if (onlyDiscounted) {
-      filtered = filtered.filter(p => getDiscountInfo(p.url) !== null);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(p => p.title?.toLowerCase().includes(q));
-    }
-
-    // Sort
-    switch (sortBy) {
-      case 'price-asc': filtered = [...filtered].sort((a, b) => a.price - b.price); break;
-      case 'price-desc': filtered = [...filtered].sort((a, b) => b.price - a.price); break;
-      case 'name-asc': filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title)); break;
-      case 'discount-desc':
-        filtered = [...filtered].sort((a, b) => {
-          const dA = getDiscountInfo(a.url)?.percent || 0;
-          const dB = getDiscountInfo(b.url)?.percent || 0;
-          return dB - dA;
-        });
-        break;
-    }
-
-    return filtered;
-  }, [initialProducts, selectedModels, selectedCategories, selectedSources, priceMin, priceMax, onlyDiscounted, searchQuery, sortBy]);
-
-  // Filtered matches
+  // Filtered matches (still client-side for comparisons view)
   const filteredMatches = useMemo(() => {
     let filtered = initialMatches.map(m => ({
       ...m,
@@ -155,13 +140,8 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
     return [...filtered].sort((a, b) => b.savingsPercent - a.savingsPercent);
   }, [initialMatches, selectedModels, selectedCategories, searchQuery]);
 
-  // Pagination
-  const paginatedProducts = useMemo(() => {
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredProducts, page]);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = meta?.totalPages || 1;
+  const totalProducts = meta?.total || 0;
 
   const formatCategory = (cat: string) => cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
@@ -198,6 +178,8 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
   };
 
   const activeFiltersCount = selectedModels.length + selectedCategories.length + selectedSources.length + (onlyDiscounted ? 1 : 0) + (priceMin > 0 || priceMax < 5000 ? 1 : 0);
+
+  const showLoadingState = isLoading || (isValidating && products.length === 0);
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
@@ -307,7 +289,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
           </div>
           <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#a3a3a3' }}>
             {viewMode === 'products' ? (
-              <span><strong style={{ color: '#fff' }}>{filteredProducts.length.toLocaleString()}</strong> Products</span>
+              <span><strong style={{ color: '#fff' }}>{totalProducts.toLocaleString()}</strong> Products</span>
             ) : (
               <span><strong style={{ color: '#fff' }}>{filteredMatches.length.toLocaleString()}</strong> Price Comparisons</span>
             )}
@@ -340,6 +322,20 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
               <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20, color: '#9ca3af' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+              {isValidating && (
+                <div style={{
+                  position: 'absolute',
+                  right: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 16,
+                  height: 16,
+                  border: '2px solid #e5e7eb',
+                  borderTopColor: '#E82127',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+              )}
             </div>
 
             <button
@@ -377,7 +373,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
 
             <select
               value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortOption)}
+              onChange={e => { setSortBy(e.target.value as SortOption); setPage(1); }}
               style={{
                 padding: '12px 16px',
                 fontSize: 14,
@@ -532,7 +528,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <span style={{ fontSize: 14, color: '#6b7280' }}>
-                <strong style={{ color: '#111' }}>{filteredProducts.length.toLocaleString()}</strong> products
+                <strong style={{ color: '#111' }}>{totalProducts.toLocaleString()}</strong> products
               </span>
 
               {/* Active Filter Pills */}
@@ -566,131 +562,137 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
           {/* Products Grid */}
           {viewMode === 'products' && (
             <>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: showFilters ? 'repeat(auto-fill, minmax(220px, 1fr))' : 'repeat(auto-fill, minmax(240px, 1fr))',
-                gap: 16
-              }}>
-                {paginatedProducts.map((p, idx) => {
-                  const discount = getDiscountInfo(p.url);
-                  const affiliateUrl = getAffiliateUrl(p.url);
-                  return (
-                    <div
-                      key={idx}
-                      style={{
-                        background: '#fff',
-                        borderRadius: 12,
-                        overflow: 'hidden',
-                        border: '1px solid #e5e7eb',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                    >
-                      <Link
-                        href={`/product/${generateSlug(p.title)}`}
-                        style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+              {showLoadingState ? (
+                <ProductSkeleton count={ITEMS_PER_PAGE} showFilters={showFilters} />
+              ) : (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: showFilters ? 'repeat(auto-fill, minmax(220px, 1fr))' : 'repeat(auto-fill, minmax(240px, 1fr))',
+                  gap: 16,
+                  opacity: isValidating ? 0.7 : 1,
+                  transition: 'opacity 0.2s ease',
+                }}>
+                  {products.map((p, idx) => {
+                    const discount = getDiscountInfo(p.url);
+                    const affiliateUrl = getAffiliateUrl(p.url);
+                    return (
+                      <div
+                        key={`${p.url}-${idx}`}
+                        style={{
+                          background: '#fff',
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          border: '1px solid #e5e7eb',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
                       >
-                        <div style={{ position: 'relative' }}>
-                          {p.image && (
-                            <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
-                              <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
-                            </div>
-                          )}
-                          {discount && (
-                            <div style={{
-                              position: 'absolute',
-                              top: 8,
-                              left: 8,
-                              background: '#16a34a',
-                              color: '#fff',
-                              padding: '4px 10px',
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 700
-                            }}>
-                              {discount.percent}% OFF
-                            </div>
-                          )}
-                        </div>
-                        <div style={{ padding: 14 }}>
-                          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{p.source}</span>
-                            {p.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
-                              <span key={m} style={{ color: '#9ca3af' }}>{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
-                            ))}
-                          </div>
-                          <h3 style={{
-                            fontSize: 14,
-                            fontWeight: 500,
-                            color: '#111',
-                            marginBottom: 10,
-                            lineHeight: 1.4,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            minHeight: 40
-                          }}>
-                            {p.title}
-                          </h3>
-                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                            {discount ? (
-                              <>
-                                <span style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
-                                  ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
-                                </span>
-                                <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through' }}>
-                                  ${p.price.toFixed(0)}
-                                </span>
-                              </>
-                            ) : (
-                              <span style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>${p.price.toFixed(0)}</span>
+                        <Link
+                          href={`/product/${generateSlug(p.title)}`}
+                          style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+                        >
+                          <div style={{ position: 'relative' }}>
+                            {p.image && (
+                              <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
+                                <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                              </div>
+                            )}
+                            {discount && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 8,
+                                left: 8,
+                                background: '#16a34a',
+                                color: '#fff',
+                                padding: '4px 10px',
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 700
+                              }}>
+                                {discount.percent}% OFF
+                              </div>
                             )}
                           </div>
-                          {discount && (
-                            <div style={{
-                              marginTop: 8,
-                              padding: '6px 10px',
-                              background: '#f0fdf4',
-                              borderRadius: 6,
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center'
-                            }}>
-                              <span style={{ fontSize: 11, color: '#16a34a' }}>Use code:</span>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>
-                                {discount.code}
-                              </span>
+                          <div style={{ padding: 14 }}>
+                            <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+                              <span>{p.source}</span>
+                              {p.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
+                                <span key={m} style={{ color: '#9ca3af' }}>{MODEL_LABELS[m]?.split(' ')[1] || m}</span>
+                              ))}
                             </div>
-                          )}
+                            <h3 style={{
+                              fontSize: 14,
+                              fontWeight: 500,
+                              color: '#111',
+                              marginBottom: 10,
+                              lineHeight: 1.4,
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              minHeight: 40
+                            }}>
+                              {p.title}
+                            </h3>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                              {discount ? (
+                                <>
+                                  <span style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
+                                    ${(p.price * (1 - discount.percent / 100)).toFixed(0)}
+                                  </span>
+                                  <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through' }}>
+                                    ${p.price.toFixed(0)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>${p.price.toFixed(0)}</span>
+                              )}
+                            </div>
+                            {discount && (
+                              <div style={{
+                                marginTop: 8,
+                                padding: '6px 10px',
+                                background: '#f0fdf4',
+                                borderRadius: 6,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                              }}>
+                                <span style={{ fontSize: 11, color: '#16a34a' }}>Use code:</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>
+                                  {discount.code}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+                        <div style={{ padding: '0 14px 14px' }}>
+                          <a
+                            href={affiliateUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              padding: '10px',
+                              background: '#E82127',
+                              color: '#fff',
+                              borderRadius: 8,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              textDecoration: 'none',
+                              textAlign: 'center'
+                            }}
+                          >
+                            Visit {p.source} →
+                          </a>
                         </div>
-                      </Link>
-                      <div style={{ padding: '0 14px 14px' }}>
-                        <a
-                          href={affiliateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '10px',
-                            background: '#E82127',
-                            color: '#fff',
-                            borderRadius: 8,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                            textAlign: 'center'
-                          }}
-                        >
-                          Visit {p.source} →
-                        </a>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Pagination */}
               {totalPages > 1 && (
@@ -909,6 +911,15 @@ export default function HomeClient({ initialProducts, initialMatches, stats }: H
           </div>
         </>
       )}
+
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 }
