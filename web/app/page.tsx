@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getProducts, getMatches, getProductStats, getInitialProducts } from '../lib/data';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '../lib/constants';
 import Header from '../components/Header';
+import HeroSection from '../components/HeroSection';
 import HomeClient from '../components/HomeClient';
 import Footer from '../components/Footer';
 
@@ -147,32 +148,8 @@ export default function Home() {
       {/* Header Navigation */}
       <Header stats={stats} />
 
-      {/* SEO Hero Section - Server rendered FIRST for Google */}
-      <section style={{ background: '#fff', padding: '32px 24px 0', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 36, fontWeight: 800, color: '#111', marginBottom: 16 }}>
-            Compare Tesla Accessory Prices in {new Date().getFullYear()}
-          </h1>
-          <p style={{ fontSize: 18, color: '#4b5563', lineHeight: 1.7, maxWidth: 800, margin: '0 auto 24px' }}>
-            Find the best deals on Tesla accessories from {stats.totalStores}+ verified stores.
-            Compare prices on floor mats, screen protectors, charging accessories for Model 3, Model Y, Model S, Model X, and Cybertruck.
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 32, padding: '16px 0 32px', flexWrap: 'wrap' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#E82127' }}>{stats.totalProducts.toLocaleString()}+</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>Products</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#E82127' }}>{stats.totalStores}</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>Stores</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#16a34a' }}>20%</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>Max Savings</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Premium Hero Section */}
+      <HeroSection stats={stats} />
 
       {/* Interactive client component with all the filters/search */}
       <HomeClient
