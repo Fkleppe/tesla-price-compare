@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { getProducts, getMatches, getProductStats, getInitialProducts } from '../lib/data';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '../lib/constants';
+import Header from '../components/Header';
 import HomeClient from '../components/HomeClient';
 import Footer from '../components/Footer';
 
@@ -142,6 +143,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
+
+      {/* Header Navigation */}
+      <Header stats={stats} />
 
       {/* SEO Hero Section - Server rendered FIRST for Google */}
       <section style={{ background: '#fff', padding: '32px 24px 0', borderBottom: '1px solid #e5e7eb' }}>
