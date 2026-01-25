@@ -11,7 +11,7 @@ import { isAffiliatePartner, getDiscountInfo } from '@/lib/affiliate';
 import { Product } from '@/lib/types';
 
 interface Props {
-  params: Promise<{ model: string; category: string }>;
+  params: Promise<{ slug: string; category: string }>;
 }
 
 async function getProducts(): Promise<Product[]> {
@@ -29,7 +29,7 @@ export async function generateStaticParams() {
   const products = await getProducts();
   const affiliateProducts = products.filter(p => isAffiliatePartner(p.url));
 
-  const combinations: { model: string; category: string }[] = [];
+  const combinations: { slug: string; category: string }[] = [];
 
   for (const model of TESLA_MODELS.filter(m => m.id !== 'universal')) {
     for (const category of CATEGORIES) {
@@ -38,7 +38,7 @@ export async function generateStaticParams() {
         p => p.models?.includes(model.id) && p.category === category.id
       );
       if (hasProducts) {
-        combinations.push({ model: model.id, category: category.id });
+        combinations.push({ slug: model.id, category: category.id });
       }
     }
   }
@@ -58,7 +58,7 @@ const MODEL_INFO: Record<string, { name: string; year: string }> = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { model, category } = await params;
+  const { slug: model, category } = await params;
   const modelData = TESLA_MODELS.find(m => m.id === model);
   const categoryData = CATEGORIES.find(c => c.id === category);
 
@@ -183,7 +183,7 @@ function generateItemListJsonLd(
 }
 
 export default async function ModelCategoryPage({ params }: Props) {
-  const { model, category } = await params;
+  const { slug: model, category } = await params;
   const modelData = TESLA_MODELS.find(m => m.id === model);
   const categoryData = CATEGORIES.find(c => c.id === category);
 

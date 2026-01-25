@@ -47,26 +47,12 @@ function generateSlug(title: string): string {
     .slice(0, 100);
 }
 
-const TOP_10_CATEGORIES = [
-  { id: 'mattress', title: 'Tesla Mattresses' },
-  { id: 'tent', title: 'Camping Tents' },
-  { id: 'floor-mats', title: 'Floor Mats' },
-  { id: 'screen-protector', title: 'Screen Protectors' },
-  { id: 'center-console', title: 'Center Console' },
-  { id: 'charger', title: 'Charging Accessories' },
-  { id: 'sunshade', title: 'Sunshades' },
-  { id: 'wheel-covers', title: 'Wheel Covers' },
-  { id: 'trunk-organizer', title: 'Trunk Organizers' },
-  { id: 'phone-mount', title: 'Phone Mounts' },
-];
-
 const ITEMS_PER_PAGE = 48;
 
 export default function HomeClient({ initialProducts, initialMatches, stats, initialMeta }: HomeClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('products');
   const [selectedMatch, setSelectedMatch] = useState<ProductMatch | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [showTop10Menu, setShowTop10Menu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Filters
@@ -220,64 +206,23 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
   return (
     <div className="home-container">
-      {/* Header */}
-      <header className="home-header">
-        <div className="header-inner">
-          <div className="header-left">
-            <Link href="/" className="logo">
-              EV<span className="logo-accent">PriceHunt</span>
-            </Link>
-            {/* Top 10 Dropdown - Desktop */}
-            <div
-              className="top10-dropdown desktop-only"
-              onMouseEnter={() => setShowTop10Menu(true)}
-              onMouseLeave={() => setShowTop10Menu(false)}
-            >
-              <button className="top10-btn">
-                Top 10 Lists
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              {showTop10Menu && (
-                <div className="top10-menu">
-                  <Link href="/top-10" className="top10-item top10-header">
-                    All Top 10 Lists
-                  </Link>
-                  {TOP_10_CATEGORIES.map(cat => (
-                    <Link key={cat.id} href={`/top-10/${cat.id}`} className="top10-item">
-                      {cat.title}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="view-toggle">
-              <button
-                onClick={() => { setViewMode('products'); setPage(1); }}
-                className={`toggle-btn ${viewMode === 'products' ? 'active' : ''}`}
-              >
-                Products
-              </button>
-              <button
-                onClick={() => setViewMode('comparisons')}
-                className={`toggle-btn ${viewMode === 'comparisons' ? 'active' : ''}`}
-              >
-                Compare
-              </button>
-            </div>
-          </div>
-          <div className="header-stats desktop-only">
-            {viewMode === 'products' ? (
-              <span><strong>{totalProducts.toLocaleString()}</strong> Products</span>
-            ) : (
-              <span><strong>{filteredMatches.length.toLocaleString()}</strong> Comparisons</span>
-            )}
-            <span><strong>{stats.totalStores}</strong> Stores</span>
-            <span className="stat-sale"><strong>{discountedCount}</strong> On Sale</span>
-          </div>
+      {/* View Toggle Bar */}
+      <div className="view-toggle-bar">
+        <div className="view-toggle">
+          <button
+            onClick={() => { setViewMode('products'); setPage(1); }}
+            className={`toggle-btn ${viewMode === 'products' ? 'active' : ''}`}
+          >
+            Products ({totalProducts.toLocaleString()})
+          </button>
+          <button
+            onClick={() => setViewMode('comparisons')}
+            className={`toggle-btn ${viewMode === 'comparisons' ? 'active' : ''}`}
+          >
+            Compare ({filteredMatches.length})
+          </button>
         </div>
-      </header>
+      </div>
 
       {/* Search Bar */}
       <div className="search-bar">
@@ -725,77 +670,14 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           background: #f8f9fa;
         }
 
-        /* Header */
-        .home-header {
-          background: #0a0a0a;
-          padding: 14px 0;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-        .header-inner {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 0 16px;
+        /* View Toggle Bar */
+        .view-toggle-bar {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 16px;
-        }
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          flex-wrap: wrap;
-        }
-        .logo {
-          color: #fff;
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 700;
-          white-space: nowrap;
-        }
-        .logo-accent { color: #E82127; }
-
-        .top10-dropdown { position: relative; }
-        .top10-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: none;
-          border: none;
-          color: #fbbf24;
-          font-size: 13px;
-          font-weight: 600;
-          cursor: pointer;
-          padding: 8px 0;
-        }
-        .top10-menu {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-          min-width: 260px;
-          padding: 8px 0;
-          z-index: 200;
-        }
-        .top10-item {
-          display: block;
-          padding: 10px 16px;
-          color: #374151;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 500;
-        }
-        .top10-item:hover { background: #f3f4f6; }
-        .top10-header {
-          font-weight: 600;
-          color: #111;
+          justify-content: center;
+          padding: 16px;
+          background: #f9fafb;
           border-bottom: 1px solid #e5e7eb;
         }
-
         .view-toggle {
           display: flex;
           gap: 4px;
@@ -816,15 +698,6 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           min-height: 40px;
         }
         .toggle-btn.active { background: #E82127; }
-
-        .header-stats {
-          display: flex;
-          gap: 20px;
-          font-size: 13px;
-          color: #a3a3a3;
-        }
-        .header-stats strong { color: #fff; }
-        .stat-sale strong { color: #16a34a; }
 
         /* Search Bar */
         .search-bar {
@@ -1668,9 +1541,6 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           .comparisons-grid {
             grid-template-columns: repeat(3, 1fr);
           }
-          .header-inner {
-            padding: 0 24px;
-          }
           .search-inner {
             padding: 0 24px;
           }
@@ -1715,16 +1585,6 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
         /* Small phones (iPhone SE, 375px and below) */
         @media (max-width: 375px) {
-          .home-header {
-            padding: 12px 0;
-          }
-          .header-inner {
-            padding: 0 12px;
-            gap: 12px;
-          }
-          .logo {
-            font-size: 16px;
-          }
           .view-toggle {
             padding: 3px;
           }
@@ -1805,12 +1665,6 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
         /* Landscape phones (improve usability) */
         @media (max-width: 767px) and (orientation: landscape) {
-          .home-header {
-            padding: 8px 0;
-          }
-          .header-inner {
-            gap: 12px;
-          }
           .view-toggle {
             padding: 3px;
           }
