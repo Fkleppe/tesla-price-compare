@@ -49,7 +49,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
 
       <style jsx>{`
         .breadcrumbs {
-          padding: 16px 0;
+          padding: 1rem 0;
         }
         .breadcrumb-list {
           display: flex;
@@ -58,26 +58,27 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
           list-style: none;
           margin: 0;
           padding: 0;
-          font-size: 13px;
+          font-size: 0.8rem;
         }
         .breadcrumb-item {
           display: flex;
           align-items: center;
         }
         .breadcrumb-separator {
-          margin: 0 10px;
-          color: #d1d5db;
+          margin: 0 0.625rem;
+          color: var(--text-muted);
+          opacity: 0.5;
         }
         .breadcrumb-link {
-          color: #6b7280;
+          color: var(--text-secondary);
           text-decoration: none;
           transition: color 0.2s;
         }
         .breadcrumb-link:hover {
-          color: #111;
+          color: var(--text-primary);
         }
         .breadcrumb-current {
-          color: #111;
+          color: var(--text-primary);
           font-weight: 500;
         }
       `}</style>
