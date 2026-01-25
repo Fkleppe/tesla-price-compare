@@ -10,11 +10,61 @@ interface Product {
   scrapedAt?: string;
   models?: string[];
   category?: string;
+  source?: string;
+}
+
+interface ProductMatch {
+  products: { source: string }[];
 }
 
 interface ProductsResult {
   products: Product[];
   lastScrapedAt: Date;
+}
+
+const AFFILIATE_STORES = ['tesery', 'yeslak', 'hansshow', 'jowua', 'tesmanian', 'tesloid', 'shop4tesla', 'snuuzu', 'havnby'];
+
+async function getMatches(): Promise<ProductMatch[]> {
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'matches.json');
+    const data = await fs.readFile(dataPath, 'utf-8');
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+function getStoreComparisonSlugs(matches: ProductMatch[]): string[] {
+  const isAffiliate = (source: string) =>
+    AFFILIATE_STORES.some(a => source.toLowerCase().includes(a));
+
+  const pairMap = new Map<string, number>();
+
+  for (const match of matches) {
+    const stores = [...new Set(
+      match.products
+        .filter(p => isAffiliate(p.source))
+        .map(p => {
+          for (const key of AFFILIATE_STORES) {
+            if (p.source.toLowerCase().includes(key)) return key;
+          }
+          return p.source.toLowerCase();
+        })
+    )].sort();
+
+    if (stores.length >= 2) {
+      for (let i = 0; i < stores.length; i++) {
+        for (let j = i + 1; j < stores.length; j++) {
+          const key = `${stores[i]}-vs-${stores[j]}`;
+          pairMap.set(key, (pairMap.get(key) || 0) + 1);
+        }
+      }
+    }
+  }
+
+  return Array.from(pairMap.entries())
+    .filter(([, count]) => count >= 2)
+    .map(([slug]) => slug);
 }
 
 async function getProducts(): Promise<ProductsResult> {
@@ -146,6 +196,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  // Store comparison pages
+  const matches = await getMatches();
+  const comparisonSlugs = getStoreComparisonSlugs(matches);
+  const comparePages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/compare`,
+      lastModified: lastScrapedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    ...comparisonSlugs.map(slug => ({
+      url: `${baseUrl}/compare/${slug}`,
+      lastModified: lastScrapedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })),
+  ];
+
   // Product pages (limit to first 5000 for sitemap size)
   // Use each product's actual scrape date for accurate lastModified
   const productPages: MetadataRoute.Sitemap = products.slice(0, 5000).map(product => ({
@@ -161,6 +229,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryPages,
     ...top10Pages,
     ...modelCategoryPages,
+    ...comparePages,
     ...productPages,
   ];
 }
