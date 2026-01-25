@@ -8,8 +8,9 @@ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/constants";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
+  variable: "--font-inter",
 });
 
 export const viewport: Viewport = {
