@@ -175,10 +175,9 @@ export default function HeroSection({ stats }: HeroSectionProps) {
       <style jsx>{`
         .hero {
           position: relative;
-          min-height: 70vh;
           display: flex;
           align-items: center;
-          padding: 3rem 1.5rem 4rem;
+          padding: 2rem 1.5rem 2.5rem;
           background: #050505;
           overflow: hidden;
         }
@@ -245,8 +244,8 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           max-width: 1400px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns: 1fr 420px;
-          gap: 4rem;
+          grid-template-columns: 1fr 360px;
+          gap: 3rem;
           align-items: center;
           z-index: 1;
         }
@@ -254,7 +253,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         @media (max-width: 1100px) {
           .hero-container {
             grid-template-columns: 1fr;
-            gap: 3rem;
+            gap: 2rem;
           }
         }
 
@@ -267,12 +266,12 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         .live-badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.5rem 1rem 0.5rem 0.75rem;
+          gap: 0.5rem;
+          padding: 0.375rem 0.75rem 0.375rem 0.625rem;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 100px;
-          margin-bottom: 2rem;
+          margin-bottom: 1rem;
           opacity: 0;
           transform: translateY(20px);
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -312,11 +311,11 @@ export default function HeroSection({ stats }: HeroSectionProps) {
 
         /* Headline */
         .headline {
-          font-size: clamp(3rem, 7vw, 5.5rem);
+          font-size: clamp(2rem, 5vw, 3.5rem);
           font-weight: 800;
-          line-height: 1;
-          letter-spacing: -0.04em;
-          margin-bottom: 1.5rem;
+          line-height: 1.05;
+          letter-spacing: -0.03em;
+          margin-bottom: 1rem;
         }
 
         .headline .line {
@@ -347,10 +346,10 @@ export default function HeroSection({ stats }: HeroSectionProps) {
 
         /* Subtext */
         .subtext {
-          font-size: 1.25rem;
+          font-size: 1rem;
           color: rgba(255, 255, 255, 0.5);
-          line-height: 1.6;
-          margin-bottom: 2rem;
+          line-height: 1.5;
+          margin-bottom: 1.25rem;
           opacity: 0;
           transform: translateY(20px);
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
@@ -372,7 +371,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
 
         /* Search Bar */
         .hero-search {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
           opacity: 0;
           transform: translateY(20px);
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
@@ -386,11 +385,11 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         .search-bar {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          padding: 1rem 1.25rem;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 14px;
+          border-radius: 10px;
           text-decoration: none;
           transition: all 0.2s ease;
         }
@@ -445,16 +444,16 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         }
 
         .quick-label {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           color: rgba(255, 255, 255, 0.4);
         }
 
         .quick-links :global(.quick-link) {
-          padding: 0.5rem 1rem;
+          padding: 0.375rem 0.75rem;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 100px;
-          font-size: 0.85rem;
+          font-size: 0.75rem;
           color: rgba(255, 255, 255, 0.7);
           text-decoration: none;
           transition: all 0.2s ease;
@@ -480,10 +479,10 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         }
 
         .stats-card {
-          padding: 1.5rem;
+          padding: 1rem;
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 20px;
+          border-radius: 14px;
           opacity: 0;
           transform: translateX(40px);
           transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
@@ -497,9 +496,9 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         .stats-header {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          margin-bottom: 1.5rem;
-          padding-bottom: 1rem;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
@@ -507,45 +506,45 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
+          width: 28px;
+          height: 28px;
           background: rgba(232, 33, 39, 0.1);
-          border-radius: 10px;
+          border-radius: 8px;
         }
 
         .stats-icon svg {
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           color: #E82127;
         }
 
         .stats-title {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-weight: 600;
           color: #fff;
         }
 
         .stat-row {
-          margin-bottom: 1rem;
+          margin-bottom: 0.75rem;
         }
 
         .stat-row:last-of-type {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
         }
 
         .stat-info {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.375rem;
         }
 
         .stat-label {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           color: rgba(255, 255, 255, 0.5);
         }
 
         .stat-value {
-          font-size: 0.85rem;
+          font-size: 0.75rem;
           font-weight: 700;
           color: #fff;
         }
@@ -577,15 +576,15 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         }
 
         .stats-footer {
-          padding-top: 1rem;
+          padding-top: 0.75rem;
           border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .update-badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          font-size: 0.75rem;
+          gap: 0.375rem;
+          font-size: 0.65rem;
           color: rgba(255, 255, 255, 0.4);
         }
 
@@ -614,12 +613,12 @@ export default function HeroSection({ stats }: HeroSectionProps) {
         .model-tags :global(.model-tag) {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0.625rem 1rem;
+          gap: 0.375rem;
+          padding: 0.5rem 0.75rem;
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 10px;
-          font-size: 0.85rem;
+          border-radius: 8px;
+          font-size: 0.75rem;
           color: rgba(255, 255, 255, 0.7);
           text-decoration: none;
           transition: all 0.2s ease;
@@ -653,12 +652,11 @@ export default function HeroSection({ stats }: HeroSectionProps) {
 
         @media (max-width: 640px) {
           .hero {
-            min-height: auto;
-            padding: 2rem 1rem 3rem;
+            padding: 1.5rem 1rem 2rem;
           }
 
           .headline {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
           }
 
           .search-placeholder {
@@ -667,12 +665,12 @@ export default function HeroSection({ stats }: HeroSectionProps) {
 
           .search-bar::after {
             content: 'Search products...';
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.4);
           }
 
           .stats-card {
-            padding: 1.25rem;
+            padding: 0.875rem;
           }
         }
       `}</style>
