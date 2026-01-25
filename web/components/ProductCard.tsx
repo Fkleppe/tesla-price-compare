@@ -9,9 +9,10 @@ import { generateSlug, MODEL_LABELS, formatPrice } from '@/lib/constants';
 interface ProductCardProps {
   product: Product;
   priority?: boolean;
+  index?: number;
 }
 
-export default function ProductCard({ product, priority = false }: ProductCardProps) {
+export default function ProductCard({ product, priority = false, index = 0 }: ProductCardProps) {
   const discount = getDiscountInfo(product.url);
   const slug = generateSlug(product.title);
   const affiliateUrl = getAffiliateUrl(product.url);
@@ -19,88 +20,394 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     ? product.price * (1 - discount.percent / 100)
     : product.price;
 
-  return (
-    <article className="group bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-gray-300 flex flex-col">
-      <Link href={`/product/${slug}`} className="flex flex-col flex-1">
-        {/* Product Image */}
-        <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
-          {product.image ? (
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              priority={priority}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-              No Image
-            </div>
-          )}
-          {discount && (
-            <span className="absolute top-2 left-2 px-2.5 py-1 bg-green-600 text-white text-xs font-bold rounded-md shadow-md">
-              {discount.percent}% OFF
-            </span>
-          )}
-        </div>
+  const savings = discount ? product.price - discountedPrice : 0;
 
-        {/* Product Content */}
-        <div className="p-4 flex flex-col flex-1">
-          {/* Meta */}
-          <div className="flex items-center justify-between mb-2 text-xs">
-            <span className="text-gray-600 font-medium">{product.source}</span>
-            {product.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
-              <span key={m} className="text-gray-400">
-                {MODEL_LABELS[m]?.split(' ').pop() || m}
-              </span>
-            ))}
+  return (
+    <>
+      <article
+        className="product-card"
+        style={{ animationDelay: `${index * 50}ms` }}
+      >
+        <Link href={`/product/${slug}`} className="card-link">
+          {/* Image Container */}
+          <div className="image-container">
+            {product.image ? (
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="product-image"
+                priority={priority}
+              />
+            ) : (
+              <div className="no-image">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+              </div>
+            )}
+
+            {/* Badges */}
+            {discount && (
+              <div className="badge sale-badge">
+                <span className="badge-percent">-{discount.percent}%</span>
+              </div>
+            )}
+
+            {/* Hover Overlay */}
+            <div className="hover-overlay">
+              <span className="view-text">View Details</span>
+            </div>
           </div>
 
-          {/* Title */}
-          <h3 className="text-sm font-semibold text-gray-900 mb-3 line-clamp-2 leading-snug min-h-[40px] group-hover:text-red-600 transition-colors">
-            {product.title}
-          </h3>
-
-          {/* Price */}
-          <div className="mt-auto">
-            <div className="flex flex-col gap-1">
-              <span className="text-lg font-bold text-gray-900">
-                {formatPrice(product.price)}
-              </span>
-              {discount && (
-                <span className="text-sm font-semibold text-green-600">
-                  {formatPrice(discountedPrice)} with code
+          {/* Content */}
+          <div className="card-content">
+            {/* Meta Row */}
+            <div className="meta-row">
+              <span className="store-name">{product.source}</span>
+              {product.models?.filter(m => m !== 'universal').slice(0, 1).map(m => (
+                <span key={m} className="model-badge">
+                  {MODEL_LABELS[m]?.split(' ').pop() || m}
                 </span>
+              ))}
+            </div>
+
+            {/* Title */}
+            <h3 className="product-title">{product.title}</h3>
+
+            {/* Price Section */}
+            <div className="price-section">
+              {discount ? (
+                <>
+                  <div className="price-row">
+                    <span className="price-discounted">{formatPrice(discountedPrice)}</span>
+                    <span className="price-original">{formatPrice(product.price)}</span>
+                  </div>
+                  <span className="savings-text">Save {formatPrice(savings)}</span>
+                </>
+              ) : (
+                <span className="price-regular">{formatPrice(product.price)}</span>
               )}
             </div>
 
             {/* Discount Code */}
             {discount && (
-              <div className="mt-2 px-3 py-2 bg-green-50 border border-green-200 border-dashed rounded-lg flex items-center justify-between gap-2">
-                <span className="font-mono text-sm font-bold text-green-700 tracking-wide">
-                  {discount.code}
-                </span>
-                <span className="px-2 py-0.5 bg-green-600 text-white text-xs font-bold rounded">
-                  -{discount.percent}%
-                </span>
+              <div className="discount-box">
+                <div className="code-section">
+                  <span className="code-label">Code:</span>
+                  <span className="code-value">{discount.code}</span>
+                </div>
+                <span className="code-badge">-{discount.percent}%</span>
               </div>
             )}
           </div>
-        </div>
-      </Link>
+        </Link>
 
-      {/* Visit Button */}
-      <div className="p-4 pt-0">
-        <a
-          href={affiliateUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold text-center rounded-lg transition-all duration-200 hover:shadow-md active:scale-95"
-        >
-          Visit {product.source} →
-        </a>
-      </div>
-    </article>
+        {/* CTA Button */}
+        <div className="card-footer">
+          <a
+            href={affiliateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="visit-btn"
+          >
+            <span>Shop at {product.source}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10" />
+            </svg>
+          </a>
+        </div>
+      </article>
+
+      <style jsx>{`
+        .product-card {
+          display: flex;
+          flex-direction: column;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-subtle);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: fadeInUp 0.5s ease-out forwards;
+          opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .product-card:hover {
+          border-color: var(--border-default);
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-lg);
+        }
+
+        .card-link {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          text-decoration: none;
+          color: inherit;
+        }
+
+        /* Image */
+        .image-container {
+          position: relative;
+          aspect-ratio: 4/3;
+          background: var(--bg-tertiary);
+          overflow: hidden;
+        }
+
+        .product-card :global(.product-image) {
+          object-fit: cover;
+          transition: transform 0.5s ease;
+        }
+
+        .product-card:hover :global(.product-image) {
+          transform: scale(1.05);
+        }
+
+        .no-image {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: var(--text-muted);
+        }
+
+        .no-image svg {
+          width: 48px;
+          height: 48px;
+          opacity: 0.5;
+        }
+
+        /* Badges */
+        .sale-badge {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          padding: 6px 10px;
+          background: var(--accent-success);
+          border-radius: 8px;
+          z-index: 2;
+        }
+
+        .badge-percent {
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: white;
+        }
+
+        /* Hover Overlay */
+        .hover-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 1;
+        }
+
+        .product-card:hover .hover-overlay {
+          opacity: 1;
+        }
+
+        .view-text {
+          padding: 10px 20px;
+          background: white;
+          color: var(--bg-primary);
+          font-size: 0.85rem;
+          font-weight: 600;
+          border-radius: 8px;
+          transform: translateY(10px);
+          transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .view-text {
+          transform: translateY(0);
+        }
+
+        /* Content */
+        .card-content {
+          display: flex;
+          flex-direction: column;
+          padding: 1rem;
+          flex: 1;
+        }
+
+        .meta-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+        }
+
+        .store-name {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .model-badge {
+          font-size: 0.65rem;
+          padding: 3px 8px;
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-subtle);
+          border-radius: 4px;
+          color: var(--text-muted);
+        }
+
+        .product-title {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          line-height: 1.4;
+          margin-bottom: 0.75rem;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          min-height: 2.8em;
+          transition: color 0.2s;
+        }
+
+        .product-card:hover .product-title {
+          color: var(--accent-primary);
+        }
+
+        /* Price */
+        .price-section {
+          margin-top: auto;
+          margin-bottom: 0.75rem;
+        }
+
+        .price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 0.5rem;
+        }
+
+        .price-regular {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .price-discounted {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--accent-success);
+        }
+
+        .price-original {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          text-decoration: line-through;
+        }
+
+        .savings-text {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: var(--accent-success);
+          margin-top: 2px;
+        }
+
+        /* Discount Box */
+        .discount-box {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.625rem 0.75rem;
+          background: rgba(34, 197, 94, 0.1);
+          border: 1px dashed rgba(34, 197, 94, 0.3);
+          border-radius: 8px;
+        }
+
+        .code-section {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+        }
+
+        .code-label {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+        }
+
+        .code-value {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--accent-success);
+          letter-spacing: 0.05em;
+        }
+
+        .code-badge {
+          padding: 3px 8px;
+          background: var(--accent-success);
+          color: white;
+          font-size: 0.7rem;
+          font-weight: 700;
+          border-radius: 4px;
+        }
+
+        /* Footer */
+        .card-footer {
+          padding: 0 1rem 1rem;
+        }
+
+        .visit-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          background: var(--accent-primary);
+          color: white;
+          font-size: 0.85rem;
+          font-weight: 600;
+          text-decoration: none;
+          border-radius: 10px;
+          transition: all 0.2s;
+        }
+
+        .visit-btn:hover {
+          background: var(--accent-secondary);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-accent);
+        }
+
+        .visit-btn:active {
+          transform: scale(0.98);
+        }
+
+        .visit-btn svg {
+          width: 16px;
+          height: 16px;
+          transition: transform 0.2s;
+        }
+
+        .visit-btn:hover svg {
+          transform: translate(2px, -2px);
+        }
+      `}</style>
+    </>
   );
 }
