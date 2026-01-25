@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { TESLA_MODELS, CATEGORIES, TOP_10_LISTS, generateSlug, SITE_URL } from '@/lib/constants';
+import { isAffiliatePartner } from '@/lib/affiliate';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -7,6 +8,8 @@ interface Product {
   title: string;
   url: string;
   scrapedAt?: string;
+  models?: string[];
+  category?: string;
 }
 
 interface ProductsResult {
@@ -123,6 +126,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
+  // Model + Category combination pages (pSEO)
+  const affiliateProducts = products.filter(p => isAffiliatePartner(p.url));
+  const modelCategoryPages: MetadataRoute.Sitemap = [];
+
+  for (const model of TESLA_MODELS.filter(m => m.id !== 'universal')) {
+    for (const category of CATEGORIES) {
+      const hasProducts = affiliateProducts.some(
+        p => p.models?.includes(model.id) && p.category === category.id
+      );
+      if (hasProducts) {
+        modelCategoryPages.push({
+          url: `${baseUrl}/model/${model.id}/${category.id}`,
+          lastModified: lastScrapedAt,
+          changeFrequency: 'weekly' as const,
+          priority: 0.75,
+        });
+      }
+    }
+  }
+
   // Product pages (limit to first 5000 for sitemap size)
   // Use each product's actual scrape date for accurate lastModified
   const productPages: MetadataRoute.Sitemap = products.slice(0, 5000).map(product => ({
@@ -137,6 +160,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...modelPages,
     ...categoryPages,
     ...top10Pages,
+    ...modelCategoryPages,
     ...productPages,
   ];
 }

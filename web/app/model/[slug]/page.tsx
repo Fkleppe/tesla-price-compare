@@ -291,7 +291,7 @@ export default async function ModelPage({ params }: Props) {
             {availableCategories.map(cat => (
               <Link
                 key={cat.id}
-                href={`/category/${cat.id}?model=${model.id}`}
+                href={`/model/${model.id}/${cat.id}`}
                 style={{
                   padding: '10px 20px',
                   background: '#fff',
