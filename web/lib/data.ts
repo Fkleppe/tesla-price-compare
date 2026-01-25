@@ -2,7 +2,7 @@
 // These functions read directly from JSON files and should only be used in Server Components
 
 import { Product, ProductMatch } from './types';
-import { isAffiliatePartner } from './affiliate';
+import { isAffiliatePartner, getDiscountInfo } from './affiliate';
 
 // Import JSON data directly for server-side use
 import allProductsData from '../data/latest.json';
@@ -57,7 +57,7 @@ export function getProductStats(products: Product[], matches: ProductMatch[]): P
     totalProducts: products.length,
     totalStores: sources.size,
     totalMatches: filteredMatches.length,
-    discountedCount: 0, // Will be calculated client-side since it depends on affiliate logic
+    discountedCount: products.filter(p => getDiscountInfo(p.url) !== null).length,
     maxPrice: Math.ceil(maxPrice / 100) * 100,
     models: modelOrder.filter((m) => models.has(m)),
     categories: Array.from(categories).sort(),
