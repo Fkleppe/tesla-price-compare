@@ -9,8 +9,9 @@ import allProductsData from '../data/latest.json';
 import matchesData from '../data/ai-matches.json';
 
 export function getProducts(): Product[] {
+  // Return ALL products with price >= $10
   const products = (allProductsData as Product[]).filter(
-    (p) => p.price >= 10 && isAffiliatePartner(p.url)
+    (p) => p.price >= 10
   );
   return products;
 }
