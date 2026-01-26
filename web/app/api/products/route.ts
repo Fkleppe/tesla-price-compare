@@ -50,10 +50,8 @@ export async function GET(request: NextRequest) {
       const fileContent = await fs.readFile(dataPath, 'utf-8');
       const allProducts = JSON.parse(fileContent) as Product[];
 
-      // Base filter: products >= $10 and from affiliate partners
-      products = allProducts.filter((p) =>
-        p.price >= 10 && isAffiliatePartner(p.url)
-      );
+      // Base filter: products >= $10
+      products = allProducts.filter((p) => p.price >= 10);
 
       // Store in cache
       dataCache.set(CACHE_KEY, products);
