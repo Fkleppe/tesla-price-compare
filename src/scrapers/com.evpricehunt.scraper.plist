@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.evpricehunt.scraper</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/kleppe14/tesla-price-compare/src/scrapers/run-scraper.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/kleppe14/tesla-price-compare</string>
+
+    <!-- Run daily at 6:00 AM -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>6</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Environment variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <!-- Logging -->
+    <key>StandardOutPath</key>
+    <string>/Users/kleppe14/tesla-price-compare/logs/scraper.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/kleppe14/tesla-price-compare/logs/scraper-error.log</string>
+
+    <!-- Don't run at load, only at scheduled time -->
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
