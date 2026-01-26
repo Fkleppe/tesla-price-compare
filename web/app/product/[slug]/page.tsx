@@ -62,22 +62,38 @@ async function getProductBySlug(slug: string): Promise<{ product: Product; simil
   return { product, similarProducts };
 }
 
-// Generate static params for all products
+// Generate static params for top products only (ISR for the rest)
+// Pre-generate affiliate products + top 1000 by price to stay under Vercel limit
 export async function generateStaticParams() {
   const products = await getProducts();
   const slugs = new Set<string>();
 
-  return products
+  // Prioritize affiliate products, then sort rest by price descending
+  const sortedProducts = products.sort((a, b) => {
+    const aAffiliate = isAffiliatePartner(a.url) ? 1 : 0;
+    const bAffiliate = isAffiliatePartner(b.url) ? 1 : 0;
+    if (aAffiliate !== bAffiliate) return bAffiliate - aAffiliate;
+    return b.price - a.price;
+  });
+
+  // Limit to ~3500 pre-generated pages to stay under Vercel 75MB limit
+  const MAX_STATIC_PAGES = 3500;
+
+  return sortedProducts
     .filter(p => {
       const slug = generateSlug(p.title);
       if (slugs.has(slug)) return false;
       slugs.add(slug);
-      return true;
+      return slugs.size <= MAX_STATIC_PAGES;
     })
     .map(product => ({
       slug: generateSlug(product.title),
     }));
 }
+
+// Enable ISR - regenerate pages every hour, generate missing pages on-demand
+export const dynamicParams = true;
+export const revalidate = 3600;
 
 // Model display names for SEO
 const MODEL_NAMES: Record<string, string> = {
