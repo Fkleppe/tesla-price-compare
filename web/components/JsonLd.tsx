@@ -4,6 +4,34 @@ import { SITE_NAME, SITE_URL } from '@/lib/constants';
 // Pre-compute priceValidUntil date (30 days from build time)
 const PRICE_VALID_UNTIL = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
+// Model display names
+const MODEL_NAMES: Record<string, string> = {
+  'model-3': 'Model 3',
+  'highland': 'Model 3 Highland',
+  'model-y': 'Model Y',
+  'juniper': 'Model Y Juniper',
+  'model-s': 'Model S',
+  'model-x': 'Model X',
+  'cybertruck': 'Cybertruck',
+  'universal': 'All Tesla Models',
+};
+
+// Category display names
+const CATEGORY_NAMES: Record<string, string> = {
+  'floor-mats': 'Floor Mats',
+  'screen-protector': 'Screen Protectors',
+  'center-console': 'Center Console Accessories',
+  'charging': 'Charging Accessories',
+  'exterior': 'Exterior Accessories',
+  'interior': 'Interior Accessories',
+  'wheel-covers': 'Wheel Covers',
+  'lighting': 'Lighting',
+  'storage': 'Storage Solutions',
+  'cargo-mats': 'Cargo Mats',
+  'sunshade': 'Sunshades',
+  'camping': 'Camping Accessories',
+};
+
 interface ProductJsonLdProps {
   product: Product;
   discountPercent?: number;
@@ -14,12 +42,21 @@ export function ProductJsonLd({ product, discountPercent }: ProductJsonLdProps) 
     ? product.price * (1 - discountPercent / 100)
     : product.price;
 
+  // Generate proper description
+  const modelNames = product.models?.filter(m => m !== 'universal').map(m => MODEL_NAMES[m] || m).join(', ') || 'all Tesla vehicles';
+  const categoryName = CATEGORY_NAMES[product.category] || product.category;
+
+  const description = product.description ||
+    `Premium ${categoryName?.toLowerCase() || 'accessory'} designed for ${modelNames}. ` +
+    `Quality Tesla accessory from ${product.source}. Fast shipping and easy returns.`;
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
-    description: product.description || `${product.title} for Tesla vehicles`,
+    description: description,
     image: product.image,
+    sku: product.sourceId,
     brand: {
       '@type': 'Brand',
       name: product.vendor || product.source,
@@ -31,9 +68,45 @@ export function ProductJsonLd({ product, discountPercent }: ProductJsonLdProps) 
       price: discountedPrice.toFixed(2),
       priceValidUntil: PRICE_VALID_UNTIL,
       availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
         name: product.source,
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'USD',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'US',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 3,
+            maxValue: 7,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
       },
     },
   };
@@ -93,20 +166,27 @@ export function ItemListJsonLd({ items, listName }: ItemListJsonLdProps) {
     '@type': 'ItemList',
     name: listName,
     numberOfItems: items.length,
-    itemListElement: items.slice(0, 10).map((product, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Product',
-        name: product.title,
-        image: product.image,
-        offers: {
-          '@type': 'Offer',
-          price: product.price.toFixed(2),
-          priceCurrency: product.currency || 'USD',
+    itemListElement: items.slice(0, 10).map((product, index) => {
+      const modelNames = product.models?.filter(m => m !== 'universal').map(m => MODEL_NAMES[m] || m).join(', ') || 'Tesla vehicles';
+      const description = product.description || `${product.title} for ${modelNames}. From ${product.source}.`;
+
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Product',
+          name: product.title,
+          description: description,
+          image: product.image,
+          offers: {
+            '@type': 'Offer',
+            price: product.price.toFixed(2),
+            priceCurrency: product.currency || 'USD',
+            availability: 'https://schema.org/InStock',
+          },
         },
-      },
-    })),
+      };
+    }),
   };
 
   return (

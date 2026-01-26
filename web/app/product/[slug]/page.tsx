@@ -235,17 +235,28 @@ function generateProductJsonLd(product: Product, slug: string) {
     ? (product.price * (1 - discountInfo.percent / 100)).toFixed(2)
     : product.price.toFixed(2);
 
+  const modelNames = product.models?.filter(m => m !== 'universal').map(m => MODEL_NAMES[m] || m).join(', ') || 'all Tesla vehicles';
+  const categoryName = CATEGORY_NAMES[product.category] || product.category;
+
+  // Generate a proper description
+  const description = product.description ||
+    `Premium ${categoryName.toLowerCase()} designed specifically for ${modelNames}. ` +
+    `High-quality Tesla accessory from ${product.source}. ` +
+    `Perfect fit and easy installation. Ships with manufacturer warranty.`;
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
-    description: `${product.title} for Tesla ${product.models?.filter(m => m !== 'universal').join(', ') || 'vehicles'}. From ${product.source}.`,
+    description: description,
     image: product.image || undefined,
+    sku: `${product.sourceId}-${generateSlug(product.title).slice(0, 20)}`,
+    mpn: product.sourceId,
     brand: {
       '@type': 'Brand',
       name: product.vendor || product.source,
     },
-    category: product.category,
+    category: categoryName,
     offers: {
       '@type': 'Offer',
       url: `${SITE_URL}/product/${slug}`,
@@ -253,9 +264,45 @@ function generateProductJsonLd(product: Product, slug: string) {
       price: discountedPrice,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
         name: product.source,
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'USD',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'US',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 3,
+            maxValue: 7,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
       },
     },
   };
