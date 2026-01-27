@@ -76,8 +76,8 @@ export async function generateStaticParams() {
     return b.price - a.price;
   });
 
-  // Limit to ~3500 pre-generated pages to stay under Vercel 75MB limit
-  const MAX_STATIC_PAGES = 3500;
+  // Pre-generate top 4000 pages (Vercel has 75MB body limit)
+  const MAX_STATIC_PAGES = 4000;
 
   return sortedProducts
     .filter(p => {

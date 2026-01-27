@@ -7,6 +7,7 @@ import path from 'path';
 interface Product {
   title: string;
   url: string;
+  price: number;
   scrapedAt?: string;
   models?: string[];
   category?: string;
@@ -214,14 +215,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  // Product pages (limit to first 5000 for sitemap size)
+  // Product pages - include ALL products, prioritize affiliate partners
   // Use each product's actual scrape date for accurate lastModified
-  const productPages: MetadataRoute.Sitemap = products.slice(0, 5000).map(product => ({
-    url: `${baseUrl}/product/${generateSlug(product.title)}`,
-    lastModified: product.scrapedAt ? new Date(product.scrapedAt) : lastScrapedAt,
-    changeFrequency: 'daily' as const,
-    priority: 0.6,
-  }));
+  const seenSlugs = new Set<string>();
+  const sortedProducts = products
+    .filter(p => p.price >= 10)
+    .sort((a, b) => {
+      const aAffiliate = isAffiliatePartner(a.url) ? 1 : 0;
+      const bAffiliate = isAffiliatePartner(b.url) ? 1 : 0;
+      if (aAffiliate !== bAffiliate) return bAffiliate - aAffiliate;
+      return b.price - a.price;
+    });
+
+  const productPages: MetadataRoute.Sitemap = sortedProducts
+    .filter(product => {
+      const slug = generateSlug(product.title);
+      if (seenSlugs.has(slug)) return false;
+      seenSlugs.add(slug);
+      return true;
+    })
+    .map(product => ({
+      url: `${baseUrl}/product/${generateSlug(product.title)}`,
+      lastModified: product.scrapedAt ? new Date(product.scrapedAt) : lastScrapedAt,
+      changeFrequency: 'daily' as const,
+      priority: isAffiliatePartner(product.url) ? 0.7 : 0.5,
+    }));
 
   return [
     ...staticPages,
