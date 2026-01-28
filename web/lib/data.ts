@@ -67,8 +67,21 @@ export function getProductStats(products: Product[], matches: ProductMatch[]): P
 }
 
 // Get a subset of products for initial SSR (first page)
+// Prioritize affiliate partners first, then sort by price ascending
 export function getInitialProducts(products: Product[], limit = 48): Product[] {
-  return products.slice(0, limit);
+  const sorted = [...products].sort((a, b) => {
+    const aIsPartner = isAffiliatePartner(a.url);
+    const bIsPartner = isAffiliatePartner(b.url);
+
+    // Partners first
+    if (aIsPartner && !bIsPartner) return -1;
+    if (!aIsPartner && bIsPartner) return 1;
+
+    // Same partner status, sort by price ascending
+    return a.price - b.price;
+  });
+
+  return sorted.slice(0, limit);
 }
 
 // Get top matches for SSR

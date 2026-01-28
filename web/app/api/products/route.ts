@@ -84,16 +84,34 @@ export async function GET(request: NextRequest) {
       filtered = filtered.filter(p => p.title?.toLowerCase().includes(search));
     }
 
-    // Apply sorting
+    // Apply sorting - always prioritize affiliate partners first
+    const sortWithPartnerPriority = (a: Product, b: Product, compareFn: (a: Product, b: Product) => number) => {
+      const aIsPartner = isAffiliatePartner(a.url);
+      const bIsPartner = isAffiliatePartner(b.url);
+
+      // Partners first
+      if (aIsPartner && !bIsPartner) return -1;
+      if (!aIsPartner && bIsPartner) return 1;
+
+      // Same partner status, use secondary sort
+      return compareFn(a, b);
+    };
+
     switch (sort) {
       case 'price-asc':
-        filtered = [...filtered].sort((a, b) => a.price - b.price);
+        filtered = [...filtered].sort((a, b) =>
+          sortWithPartnerPriority(a, b, (x, y) => x.price - y.price)
+        );
         break;
       case 'price-desc':
-        filtered = [...filtered].sort((a, b) => b.price - a.price);
+        filtered = [...filtered].sort((a, b) =>
+          sortWithPartnerPriority(a, b, (x, y) => y.price - x.price)
+        );
         break;
       case 'name-asc':
-        filtered = [...filtered].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        filtered = [...filtered].sort((a, b) =>
+          sortWithPartnerPriority(a, b, (x, y) => (x.title || '').localeCompare(y.title || ''))
+        );
         break;
       case 'discount-desc':
         filtered = [...filtered].sort((a, b) => {

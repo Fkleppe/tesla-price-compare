@@ -695,9 +695,6 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
         .toolbar {
           background: #FFFFFF;
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-          position: sticky;
-          top: 72px;
-          z-index: 50;
         }
 
         .toolbar-inner {
@@ -961,11 +958,9 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
           border: 1px solid rgba(0, 0, 0, 0.06);
           border-radius: 16px;
           overflow: hidden;
-          position: sticky;
-          top: 160px;
-          max-height: calc(100vh - 180px);
           display: flex;
           flex-direction: column;
+          height: fit-content;
         }
 
         .sidebar.mobile {
