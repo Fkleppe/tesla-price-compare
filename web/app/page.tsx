@@ -5,6 +5,7 @@ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '../lib/constants';
 import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
 import HomeClient from '../components/HomeClient';
+import ProductGridSSR from '../components/ProductGridSSR';
 import Footer from '../components/Footer';
 
 export const metadata: Metadata = {
@@ -151,7 +152,14 @@ export default function Home() {
       {/* Premium Hero Section */}
       <HeroSection stats={stats} />
 
+      {/* SSR Product Grid - Visible to Google crawlers */}
+      {/* This renders as static HTML for SEO, hidden when JS loads */}
+      <div id="ssr-products-container">
+        <ProductGridSSR products={initialProducts} />
+      </div>
+
       {/* Interactive client component with all the filters/search */}
+      {/* This replaces the SSR grid when JavaScript loads */}
       <HomeClient
         initialProducts={initialProducts}
         initialMatches={matches}

@@ -66,6 +66,14 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [page, setPage] = useState(1);
 
+  // Hide SSR products when client component mounts
+  useEffect(() => {
+    const ssrContainer = document.getElementById('ssr-products-container');
+    if (ssrContainer) {
+      ssrContainer.style.display = 'none';
+    }
+  }, []);
+
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
