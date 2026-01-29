@@ -109,11 +109,6 @@ const nextConfig: NextConfig = {
 
   // Enable React strict mode
   reactStrictMode: true,
-
-  // Experimental features for performance
-  // experimental: {
-  //   optimizeCss: true, // Requires 'critters' package
-  // },
 };
 
 export default nextConfig;
