@@ -1,0 +1,33 @@
+Codemap Generation Report
+=========================
+Generated: 2026-01-29T11:15:00Z
+
+Status: INITIAL GENERATION
+Previous Version: None
+Diff Percentage: N/A (first generation)
+
+Files Created:
+- codemaps/architecture.md (Overall system architecture)
+- codemaps/frontend.md (Next.js web application)
+- codemaps/backend.md (Scraper system)
+- codemaps/data.md (Data models and schemas)
+
+Summary:
+--------
+This is the initial codemap generation for the tesla-price-compare project.
+
+Project Overview:
+- Tesla accessory price comparison website
+- Next.js 16.1.6 frontend on Vercel
+- Python/Node.js scrapers
+- Claude AI for product matching
+- ~5000+ products from multiple stores
+- 4145+ static SEO pages
+
+Key Technologies:
+- React 19.2.3
+- Tailwind CSS 4.x
+- SWR for data fetching
+- Puppeteer + crawl4ai for scraping
+
+No user approval required (initial generation).
