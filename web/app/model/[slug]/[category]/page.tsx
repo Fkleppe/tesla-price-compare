@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -390,11 +391,13 @@ export default async function ModelCategoryPage({ params }: Props) {
                   >
                     {product.image && (
                       <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
-                        <img
+                        <Image
                           src={product.image}
                           alt={product.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          loading={idx < 12 ? 'eager' : 'lazy'}
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          priority={idx < 4}
+                          style={{ objectFit: 'cover' }}
                         />
                         {discount && (
                           <div style={{

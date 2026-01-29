@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -372,20 +373,20 @@ export default function Top10ListClient({ list, initialProducts }: Top10ListClie
 
                       {/* Image */}
                       <div style={{ width: 220, flexShrink: 0, position: 'relative' }}>
-                        <div style={{ aspectRatio: '1', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ aspectRatio: '1', background: '#f3f4f6', position: 'relative' }}>
                           {product.image ? (
-                            <img
+                            <Image
                               src={product.image}
                               alt={`${product.title} - Rank #${index + 1} in ${list.title}`}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                target.parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;font-size:14px;text-align:center;padding:20px">Image not available</div>';
-                              }}
+                              fill
+                              sizes="220px"
+                              priority={index < 3}
+                              style={{ objectFit: 'cover' }}
                             />
                           ) : (
-                            <span style={{ color: '#9ca3af', fontSize: 14 }}>No image</span>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <span style={{ color: '#9ca3af', fontSize: 14 }}>No image</span>
+                            </div>
                           )}
                         </div>
                         {discount && (

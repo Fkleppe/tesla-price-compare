@@ -20,7 +20,7 @@ export async function GET() {
     }
 
     return NextResponse.json(history);
-  } catch (error) {
+  } catch {
     // Return demo history data if file doesn't exist
     const today = new Date();
     const demoHistory: Record<string, { title: string; source: string; category: string; prices: { date: string; price: number }[] }> = {};

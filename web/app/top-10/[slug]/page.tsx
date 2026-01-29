@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -324,14 +325,15 @@ export default async function Top10ListPage({ params }: Props) {
                         </div>
 
                         {/* Product Image */}
-                        <div style={{ width: 280, flexShrink: 0, background: '#fafafa', position: 'relative' }}>
+                        <div style={{ width: 280, height: 210, flexShrink: 0, background: '#fafafa', position: 'relative' }}>
                           {product.image && (
-                            <img
+                            <Image
                               src={product.image}
                               alt={product.title}
-                              itemProp="image"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              loading={index < 3 ? 'eager' : 'lazy'}
+                              fill
+                              sizes="280px"
+                              priority={index < 3}
+                              style={{ objectFit: 'cover' }}
                             />
                           )}
                           {discount && (

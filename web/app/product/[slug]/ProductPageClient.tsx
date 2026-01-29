@@ -1,33 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { getAffiliateUrl, getDiscountInfo, isAffiliatePartner } from '../../../lib/affiliate';
-
-interface Product {
-  title: string;
-  price: number;
-  currency: string;
-  url: string;
-  image: string;
-  source: string;
-  sourceId: string;
-  category: string;
-  models: string[];
-  description?: string;
-  vendor?: string;
-}
-
-const MODEL_LABELS: Record<string, string> = {
-  'model-3': 'Model 3',
-  'highland': 'Model 3 Highland',
-  'model-y': 'Model Y',
-  'juniper': 'Model Y Juniper',
-  'model-s': 'Model S',
-  'model-x': 'Model X',
-  'cybertruck': 'Cybertruck',
-  'universal': 'Universal',
-};
+import { Product } from '@/lib/types';
+import { MODEL_LABELS, generateSlug, formatCategory } from '@/lib/constants';
 
 const MODEL_YEARS: Record<string, string> = {
   'model-3': '2017-2023',
@@ -442,20 +420,6 @@ const MAINTENANCE_TIPS: Record<string, string[]> = {
   ]
 };
 
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 100);
-}
-
-function formatCategory(cat: string) {
-  return cat.split('-').map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
-}
 
 function cleanDescription(desc: string): string {
   if (!desc) return '';
@@ -690,11 +654,14 @@ export default function ProductPageClient({
             }}>
               <div style={{ position: 'relative' }}>
                 {product.image ? (
-                  <div style={{ aspectRatio: '4/3', background: '#fafafa' }}>
-                    <img
+                  <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
+                    <Image
                       src={product.image}
                       alt={product.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 32 }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority
+                      style={{ objectFit: 'contain', padding: 32 }}
                     />
                   </div>
                 ) : (
@@ -1398,8 +1365,8 @@ export default function ProductPageClient({
                     >
                       <div style={{ position: 'relative' }}>
                         {p.image && (
-                          <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden' }}>
-                            <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div style={{ aspectRatio: '4/3', background: '#f9fafb', overflow: 'hidden', position: 'relative' }}>
+                            <Image src={p.image} alt={p.title} fill sizes="(max-width: 640px) 50vw, 25vw" style={{ objectFit: 'cover' }} />
                           </div>
                         )}
                         {pDiscount && (

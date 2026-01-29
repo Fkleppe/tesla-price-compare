@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface HeroSectionProps {
   stats: {
@@ -12,11 +12,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ stats }: HeroSectionProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Use state initializer to avoid hydration mismatch
+  const [mounted] = useState(() => typeof window !== 'undefined');
 
   return (
     <>

@@ -1,31 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
-interface Product {
-  title: string;
-  price: number;
-  currency: string;
-  url: string;
-  image: string;
-  source: string;
-  sourceId: string;
-  category: string;
-  models: string[];
-  description?: string;
-  vendor?: string;
-}
-
-const MODEL_LABELS: Record<string, string> = {
-  'model-3': 'Model 3',
-  'highland': 'Model 3 Highland',
-  'model-y': 'Model Y',
-  'juniper': 'Model Y Juniper',
-  'model-s': 'Model S',
-  'model-x': 'Model X',
-  'cybertruck': 'Cybertruck',
-  'universal': 'Universal',
-};
+import { Product } from '@/lib/types';
+import { MODEL_LABELS } from '@/lib/constants';
 
 const CATEGORY_BENEFITS: Record<string, string[]> = {
   'floor-mats': ['Custom laser-measured fit', 'Easy to clean', 'All-weather protection', 'Protects original carpet', 'Non-slip backing', 'Raised edges contain spills'],

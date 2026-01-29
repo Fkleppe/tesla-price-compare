@@ -20,7 +20,7 @@ export async function GET() {
     }
 
     return NextResponse.json(aiMatches);
-  } catch (error) {
+  } catch {
     return NextResponse.json([]);
   }
 }

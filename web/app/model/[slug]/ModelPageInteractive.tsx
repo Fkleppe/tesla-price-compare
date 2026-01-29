@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/lib/types';
 import { isAffiliatePartner, getDiscountInfo } from '@/lib/affiliate';

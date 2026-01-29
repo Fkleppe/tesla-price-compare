@@ -4,9 +4,10 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAffiliateUrl, getDiscountInfo, isAffiliatePartner } from '../lib/affiliate';
-import { Product, ProductMatch, PaginatedResponse, PaginationMeta } from '../lib/types';
+import { Product, ProductMatch, PaginatedResponse, PaginationMeta, ViewMode, SortOption } from '../lib/types';
 import { useProducts } from '../lib/hooks/useProducts';
 import ProductSkeleton from './ProductSkeleton';
+import { MODEL_LABELS, ITEMS_PER_PAGE, generateSlug, formatCategory } from '../lib/constants';
 
 interface HomeClientProps {
   initialProducts: Product[];
@@ -23,31 +24,7 @@ interface HomeClientProps {
   initialMeta: PaginationMeta;
 }
 
-const MODEL_LABELS: Record<string, string> = {
-  'all': 'All Models',
-  'model-3': 'Model 3',
-  'highland': 'Model 3 Highland',
-  'model-y': 'Model Y',
-  'juniper': 'Model Y Juniper',
-  'model-s': 'Model S',
-  'model-x': 'Model X',
-  'cybertruck': 'Cybertruck',
-  'universal': 'Universal',
-};
-
-type ViewMode = 'products' | 'comparisons';
-type SortOption = 'price-asc' | 'price-desc' | 'name-asc' | 'discount-desc' | 'newest';
-
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 100);
-}
-
-const ITEMS_PER_PAGE = 48;
+const DEFAULT_MAX_PRICE = 5000;
 
 export default function HomeClient({ initialProducts, initialMatches, stats, initialMeta }: HomeClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('products');
@@ -61,7 +38,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(5000);
+  const [priceMax, setPriceMax] = useState(DEFAULT_MAX_PRICE);
   const [onlyDiscounted, setOnlyDiscounted] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [page, setPage] = useState(1);
@@ -94,6 +71,18 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
     }
     return () => { document.body.style.overflow = ''; };
   }, [isMobile, showFilters]);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedMatch) setSelectedMatch(null);
+        if (isMobile && showFilters) setShowFilters(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [selectedMatch, isMobile, showFilters]);
 
   const fallbackData: PaginatedResponse<Product> = useMemo(() => ({
     products: initialProducts,
@@ -156,14 +145,12 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
   const totalPages = meta?.totalPages || 1;
   const totalProducts = meta?.total || 0;
 
-  const formatCategory = (cat: string) => cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
   const clearFilters = () => {
     setSelectedModels([]);
     setSelectedCategories([]);
     setSelectedSources([]);
     setPriceMin(0);
-    setPriceMax(5000);
+    setPriceMax(DEFAULT_MAX_PRICE);
     setOnlyDiscounted(false);
     setSearchQuery('');
     setPage(1);
@@ -184,7 +171,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
     setPage(1);
   };
 
-  const activeFiltersCount = selectedModels.length + selectedCategories.length + selectedSources.length + (onlyDiscounted ? 1 : 0) + (priceMin > 0 || priceMax < 5000 ? 1 : 0);
+  const activeFiltersCount = selectedModels.length + selectedCategories.length + selectedSources.length + (onlyDiscounted ? 1 : 0) + (priceMin > 0 || priceMax < DEFAULT_MAX_PRICE ? 1 : 0);
   const showLoadingState = isLoading || (isValidating && products.length === 0);
 
   return (
@@ -193,10 +180,13 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
       <div className="toolbar">
         <div className="toolbar-inner">
           {/* View Toggle */}
-          <div className="view-toggle">
+          <div className="view-toggle" role="tablist" aria-label="View options">
             <button
               onClick={() => { setViewMode('products'); setPage(1); }}
               className={`toggle-btn ${viewMode === 'products' ? 'active' : ''}`}
+              role="tab"
+              aria-selected={viewMode === 'products'}
+              aria-label="View products grid"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -210,6 +200,9 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
             <button
               onClick={() => setViewMode('comparisons')}
               className={`toggle-btn ${viewMode === 'comparisons' ? 'active' : ''}`}
+              role="tab"
+              aria-selected={viewMode === 'comparisons'}
+              aria-label="View price comparisons"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M16 3h5v5M8 3H3v5M3 16v5h5M21 16v5h-5M12 8v8M8 12h8" />
@@ -231,9 +224,10 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
               value={searchQuery}
               onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
               className="search-input"
+              aria-label="Search products"
             />
             {searchQuery && (
-              <button className="search-clear" onClick={() => { setSearchQuery(''); setPage(1); }}>
+              <button className="search-clear" onClick={() => { setSearchQuery(''); setPage(1); }} aria-label="Clear search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -247,6 +241,8 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`action-btn ${showFilters ? 'active' : ''} ${activeFiltersCount > 0 ? 'has-filters' : ''}`}
+              aria-label={showFilters ? 'Hide filters' : 'Show filters'}
+              aria-expanded={showFilters}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
@@ -263,6 +259,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                 value={sortBy}
                 onChange={e => { setSortBy(e.target.value as SortOption); setPage(1); }}
                 className="sort-select"
+                aria-label="Sort products by"
               >
                 <option value="price-asc">Price: Low → High</option>
                 <option value="price-desc">Price: High → Low</option>
@@ -349,7 +346,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                   <input
                     type="range"
                     min={0}
-                    max={stats.maxPrice || 5000}
+                    max={stats.maxPrice || DEFAULT_MAX_PRICE}
                     value={priceMax}
                     onChange={e => { setPriceMax(Number(e.target.value)); setPage(1); }}
                     className="price-slider"
@@ -621,15 +618,15 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
 
       {/* Modal */}
       {selectedMatch && (
-        <div className="modal-wrap">
-          <div className="modal-backdrop" onClick={() => setSelectedMatch(null)} />
+        <div className="modal-wrap" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <div className="modal-backdrop" onClick={() => setSelectedMatch(null)} aria-hidden="true" />
           <div className="modal">
             <div className="modal-header">
               <div className="modal-title-wrap">
-                <h2>{selectedMatch.products[0]?.title}</h2>
+                <h2 id="modal-title">{selectedMatch.products[0]?.title}</h2>
                 <p>{selectedMatch.products.length} stores • {selectedMatch.category}</p>
               </div>
-              <button onClick={() => setSelectedMatch(null)} className="modal-close">
+              <button onClick={() => setSelectedMatch(null)} className="modal-close" aria-label="Close modal">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>

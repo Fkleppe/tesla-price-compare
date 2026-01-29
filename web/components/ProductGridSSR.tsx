@@ -4,30 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '../lib/types';
 import { getDiscountInfo, getAffiliateUrl, isAffiliatePartner } from '../lib/affiliate';
+import { generateSlug, MODEL_LABELS } from '../lib/constants';
 import styles from './ProductGridSSR.module.css';
 
 interface ProductGridSSRProps {
   products: Product[];
 }
-
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 100);
-}
-
-const MODEL_LABELS: Record<string, string> = {
-  'model-3': 'Model 3',
-  'highland': 'Highland',
-  'model-y': 'Model Y',
-  'juniper': 'Juniper',
-  'model-s': 'Model S',
-  'model-x': 'Model X',
-  'cybertruck': 'Cybertruck',
-};
 
 export default function ProductGridSSR({ products }: ProductGridSSRProps) {
   return (

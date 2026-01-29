@@ -100,18 +100,7 @@ export function useProducts(
       ...params,
       search: debouncedSearch,
     });
-  }, [
-    params.page,
-    params.limit,
-    params.models,
-    params.categories,
-    params.sources,
-    params.priceMin,
-    params.priceMax,
-    params.sort,
-    params.onlyDiscounted,
-    debouncedSearch,
-  ]);
+  }, [params, debouncedSearch]);
 
   const { data, error, isLoading, isValidating } = useSWR<PaginatedResponse<Product>>(
     `/api/products?${queryString}`,
@@ -134,7 +123,7 @@ export function useProducts(
       });
       preload(`/api/products?${nextPageQuery}`, fetcher);
     }
-  }, [data?.meta?.hasMore, params.page, debouncedSearch]);
+  }, [data?.meta?.hasMore, params, debouncedSearch]);
 
   return {
     products: data?.products || [],

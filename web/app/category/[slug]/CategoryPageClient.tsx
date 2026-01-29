@@ -9,7 +9,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { ItemListJsonLd } from '@/components/JsonLd';
 import { Product } from '@/lib/types';
 import { isAffiliatePartner, getDiscountInfo } from '@/lib/affiliate';
-import { TESLA_MODELS, CATEGORIES, MODEL_LABELS, formatPrice, ITEMS_PER_PAGE } from '@/lib/constants';
+import { TESLA_MODELS, CATEGORIES, ITEMS_PER_PAGE } from '@/lib/constants';
 
 interface CategoryPageClientProps {
   category: {

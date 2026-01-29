@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -446,11 +447,15 @@ export default async function ComparePage({ params }: Props) {
                       <td style={{ padding: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           {item.s1Product?.image && (
-                            <img
-                              src={item.s1Product.image}
-                              alt=""
-                              style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }}
-                            />
+                            <div style={{ width: 48, height: 48, position: 'relative', borderRadius: 6, overflow: 'hidden' }}>
+                              <Image
+                                src={item.s1Product.image}
+                                alt=""
+                                fill
+                                sizes="48px"
+                                style={{ objectFit: 'cover' }}
+                              />
+                            </div>
                           )}
                           <div>
                             <Link

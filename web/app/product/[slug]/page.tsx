@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import fs from 'fs/promises';
 import path from 'path';
 import ProductPageInteractive from './ProductPageInteractive';
 import { isAffiliatePartner, getDiscountInfo, getAffiliateUrl } from '../../../lib/affiliate';
-import { SITE_URL } from '../../../lib/constants';
+import { SITE_URL, generateSlug } from '../../../lib/constants';
 import Footer from '../../../components/Footer';
 
 interface Product {
@@ -19,16 +20,6 @@ interface Product {
   models: string[];
   description?: string;
   vendor?: string;
-}
-
-// Generate slug from title
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 100);
 }
 
 // Get all products (filtered: price >= $10)
@@ -454,12 +445,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 }}>
                   <div style={{ position: 'relative' }}>
                     {product.image ? (
-                      <div style={{ aspectRatio: '4/3', background: '#fafafa' }}>
-                        <img
+                      <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
+                        <Image
                           src={product.image}
                           alt={product.title}
-                          itemProp="image"
-                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 32 }}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          priority
+                          style={{ objectFit: 'contain', padding: 32 }}
                         />
                       </div>
                     ) : (
@@ -726,11 +719,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                       >
                         {p.image && (
                           <div style={{ aspectRatio: '4/3', background: '#fafafa', position: 'relative' }}>
-                            <img
+                            <Image
                               src={p.image}
                               alt={p.title}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              loading="lazy"
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              style={{ objectFit: 'cover' }}
                             />
                             {pDiscount && (
                               <div style={{
