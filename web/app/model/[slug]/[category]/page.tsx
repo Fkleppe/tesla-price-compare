@@ -28,14 +28,14 @@ async function getProducts(): Promise<Product[]> {
 // Generate all valid model + category combinations
 export async function generateStaticParams() {
   const products = await getProducts();
-  const affiliateProducts = products.filter(p => isAffiliatePartner(p.url));
+  const allProducts = products.filter(p => p.price >= 10);
 
   const combinations: { slug: string; category: string }[] = [];
 
   for (const model of TESLA_MODELS.filter(m => m.id !== 'universal')) {
     for (const category of CATEGORIES) {
       // Only create page if there are products for this combination
-      const hasProducts = affiliateProducts.some(
+      const hasProducts = allProducts.some(
         p => p.models?.includes(model.id) && p.category === category.id
       );
       if (hasProducts) {
@@ -195,9 +195,9 @@ export default async function ModelCategoryPage({ params }: Props) {
   const products = await getProducts();
   const modelInfo = MODEL_INFO[model] || { name: modelData.name, year: '2020+' };
 
-  // Filter products for this model + category combination
+  // Filter all products for this model + category combination
   const filteredProducts = products.filter(
-    p => p.models?.includes(model) && p.category === category && isAffiliatePartner(p.url)
+    p => p.models?.includes(model) && p.category === category && p.price >= 10
   );
 
   if (filteredProducts.length === 0) {
@@ -211,23 +211,27 @@ export default async function ModelCategoryPage({ params }: Props) {
   const highestPrice = Math.max(...prices);
   const discountedCount = filteredProducts.filter(p => getDiscountInfo(p.url) !== null).length;
 
-  const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
-  const totalStores = new Set(partnerProducts.map(p => p.source)).size;
+  const totalStores = new Set(filteredProducts.map(p => p.source)).size;
 
-  // Sort by price ascending
-  const sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+  // Sort: affiliate first, then by price ascending
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const aAff = isAffiliatePartner(a.url) ? 0 : 1;
+    const bAff = isAffiliatePartner(b.url) ? 0 : 1;
+    if (aAff !== bAff) return aAff - bAff;
+    return a.price - b.price;
+  });
 
   // Related categories for this model
   const relatedCategories = CATEGORIES.filter(c =>
     c.id !== category &&
-    products.some(p => p.models?.includes(model) && p.category === c.id && isAffiliatePartner(p.url))
+    products.some(p => p.models?.includes(model) && p.category === c.id && p.price >= 10)
   ).slice(0, 6);
 
   // Related models for this category
   const relatedModels = TESLA_MODELS.filter(m =>
     m.id !== model &&
     m.id !== 'universal' &&
-    products.some(p => p.models?.includes(m.id) && p.category === category && isAffiliatePartner(p.url))
+    products.some(p => p.models?.includes(m.id) && p.category === category && p.price >= 10)
   ).slice(0, 6);
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(modelData, categoryData);
@@ -235,7 +239,7 @@ export default async function ModelCategoryPage({ params }: Props) {
   const itemListJsonLd = generateItemListJsonLd(sortedProducts, modelData, categoryData);
 
   const stats = {
-    totalProducts: partnerProducts.length,
+    totalProducts: productCount,
     totalStores,
     discountedCount,
   };

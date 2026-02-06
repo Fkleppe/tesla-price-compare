@@ -193,9 +193,9 @@ export default async function ModelPage({ params }: Props) {
 
   const products = await getProducts();
 
-  // Filter products for this model
+  // Filter all products for this model (affiliate + non-affiliate)
   const modelProducts = products.filter(p =>
-    p.models?.includes(model.id) && isAffiliatePartner(p.url)
+    p.models?.includes(model.id) && p.price >= 10
   );
 
   // Calculate stats
@@ -204,12 +204,16 @@ export default async function ModelPage({ params }: Props) {
     ? Math.min(...modelProducts.map(p => p.price))
     : 30;
   const discountedCount = modelProducts.filter(p => getDiscountInfo(p.url) !== null).length;
-  const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
-  const totalStores = new Set(partnerProducts.map(p => p.source)).size;
+  const totalStores = new Set(modelProducts.map(p => p.source)).size;
 
-  // Get first 24 products sorted by price for SSR
+  // Get first 24 products sorted: affiliate first, then by price
   const initialProducts = [...modelProducts]
-    .sort((a, b) => a.price - b.price)
+    .sort((a, b) => {
+      const aAff = isAffiliatePartner(a.url) ? 0 : 1;
+      const bAff = isAffiliatePartner(b.url) ? 0 : 1;
+      if (aAff !== bAff) return aAff - bAff;
+      return a.price - b.price;
+    })
     .slice(0, 24);
 
   // Get available categories for this model
@@ -223,7 +227,7 @@ export default async function ModelPage({ params }: Props) {
   const itemListJsonLd = generateItemListJsonLd(initialProducts, model.name);
 
   const stats = {
-    totalProducts: partnerProducts.length,
+    totalProducts: productCount,
     totalStores,
     discountedCount,
   };
@@ -421,7 +425,7 @@ export default async function ModelPage({ params }: Props) {
           />
         </main>
 
-        <Footer />
+        <Footer stats={{ totalProducts: stats.totalProducts, totalStores: stats.totalStores, maxSavings: 20 }} />
       </div>
     </>
   );

@@ -189,9 +189,9 @@ export default async function CategoryPage({ params }: Props) {
 
   const products = await getProducts();
 
-  // Filter products for this category
+  // Filter all products for this category (affiliate + non-affiliate)
   const categoryProducts = products.filter(p =>
-    p.category === category.id && isAffiliatePartner(p.url)
+    p.category === category.id && p.price >= 10
   );
 
   // Calculate stats
@@ -200,12 +200,16 @@ export default async function CategoryPage({ params }: Props) {
     ? Math.min(...categoryProducts.map(p => p.price))
     : 50;
   const discountedCount = categoryProducts.filter(p => getDiscountInfo(p.url) !== null).length;
-  const partnerProducts = products.filter(p => isAffiliatePartner(p.url));
-  const totalStores = new Set(partnerProducts.map(p => p.source)).size;
+  const totalStores = new Set(categoryProducts.map(p => p.source)).size;
 
-  // Get first 24 products sorted by price for SSR
+  // Get first 24 products sorted: affiliate first, then by price
   const initialProducts = [...categoryProducts]
-    .sort((a, b) => a.price - b.price)
+    .sort((a, b) => {
+      const aAff = isAffiliatePartner(a.url) ? 0 : 1;
+      const bAff = isAffiliatePartner(b.url) ? 0 : 1;
+      if (aAff !== bAff) return aAff - bAff;
+      return a.price - b.price;
+    })
     .slice(0, 24);
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(category);
@@ -214,7 +218,7 @@ export default async function CategoryPage({ params }: Props) {
   const seoContent = CATEGORY_SEO[category.id] || CATEGORY_SEO['default'];
 
   const stats = {
-    totalProducts: partnerProducts.length,
+    totalProducts: productCount,
     totalStores,
     discountedCount,
   };
@@ -384,7 +388,7 @@ export default async function CategoryPage({ params }: Props) {
           />
         </main>
 
-        <Footer />
+        <Footer stats={{ totalProducts: stats.totalProducts, totalStores: stats.totalStores, maxSavings: 20 }} />
       </div>
     </>
   );

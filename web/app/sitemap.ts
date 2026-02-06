@@ -24,7 +24,8 @@ async function getProducts(): Promise<Product[]> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getProducts();
-  const affiliateProducts = products.filter(p => isAffiliatePartner(p.url) && p.price >= 10);
+  const allProducts = products.filter(p => p.price >= 10);
+  const affiliateProducts = allProducts.filter(p => isAffiliatePartner(p.url));
 
   const now = new Date();
 
@@ -113,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const model of TESLA_MODELS.filter(m => m.id !== 'universal')) {
     for (const category of CATEGORIES) {
       // Only include if products exist for this combination
-      const hasProducts = affiliateProducts.some(
+      const hasProducts = allProducts.some(
         p => p.models?.includes(model.id) && p.category === category.id
       );
       if (hasProducts) {
@@ -127,11 +128,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Product pages - prioritize affiliate products, limit to 5000 for performance
+  // Product pages - all products, affiliate first with higher priority
   const seenSlugs = new Set<string>();
-  const productPages: MetadataRoute.Sitemap = affiliateProducts
-    .sort((a, b) => b.price - a.price) // Higher price products first
-    .slice(0, 5000)
+  const sortedProducts = [...allProducts].sort((a, b) => {
+    const aAff = isAffiliatePartner(a.url) ? 1 : 0;
+    const bAff = isAffiliatePartner(b.url) ? 1 : 0;
+    if (aAff !== bAff) return bAff - aAff;
+    return b.price - a.price;
+  });
+
+  const productPages: MetadataRoute.Sitemap = sortedProducts
     .filter(product => {
       const slug = generateSlug(product.title);
       if (seenSlugs.has(slug)) return false;
@@ -142,7 +148,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/product/${generateSlug(product.title)}`,
       lastModified: now,
       changeFrequency: 'daily' as const,
-      priority: 0.7,
+      priority: isAffiliatePartner(product.url) ? 0.7 : 0.5,
     }));
 
   return [
