@@ -70,7 +70,7 @@ export default function Home() {
         name: 'How do I find discount codes for Tesla accessories?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'EVPriceHunt partners with top Tesla accessory stores to provide exclusive discount codes. Look for the green "% OFF" badge on products. Codes include: Tesery (code "123" for 5% off), Shop4Tesla (code "10" for 10% off), Snuuzu (code "KLEPPE" for 10% off), and more.',
+          text: 'EVPriceHunt partners with top Tesla accessory stores to provide exclusive discount codes. Look for the green "% OFF" badge on products. Active codes include: Tesery (code "123" for 5% off), Shop4Tesla (code "10" for 10% off), Snuuzu (code "KLEPPE" for 10% off), Yeslak (code "discount" for 20% off), and Hansshow (code "FREDRIK" for 20% off).',
         },
       },
       {
@@ -325,8 +325,8 @@ export default function Home() {
               <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, margin: 0 }}>
                 EVPriceHunt partners with top Tesla accessory stores to provide exclusive discount codes.
                 Look for the green &quot;% OFF&quot; badge on products. Active codes include: Tesery (code &quot;123&quot; for 5% off),
-                Shop4Tesla (code &quot;10&quot; for 10% off), Snuuzu (code &quot;KLEPPE&quot; for 10% off), Yeslak (code &quot;AWD&quot; for 5% off),
-                and Hansshow (code &quot;AWD&quot; for 5% off).
+                Shop4Tesla (code &quot;10&quot; for 10% off), Snuuzu (code &quot;KLEPPE&quot; for 10% off), Yeslak (code &quot;discount&quot; for 20% off),
+                and Hansshow (code &quot;FREDRIK&quot; for 20% off).
               </p>
             </article>
 
@@ -380,7 +380,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <Footer />
+      <Footer stats={{ totalProducts: stats.totalProducts, totalStores: stats.totalStores, maxSavings: 20 }} />
     </>
   );
 }

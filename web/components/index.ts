@@ -7,7 +7,6 @@ export { default as Breadcrumbs } from './Breadcrumbs';
 export {
   ProductJsonLd,
   OrganizationJsonLd,
-  WebSiteJsonLd,
   ItemListJsonLd,
   FAQJsonLd,
 } from './JsonLd';

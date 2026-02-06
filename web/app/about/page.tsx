@@ -94,8 +94,8 @@ export default function AboutPage() {
                 We help Tesla owners find the best deals by comparing prices across multiple verified retailers.
               </p>
               <p style={{ fontSize: 16, color: '#4b5563', lineHeight: 1.8 }}>
-                Our database includes over 2,700 products from trusted stores like Tesery, Tesmanian,
-                Jowua, Shop4Tesla, and more. We also provide exclusive discount codes that can save
+                Our database includes thousands of products from trusted stores like Tesery,
+                Jowua, Shop4Tesla, Yeslak, Hansshow, and more. We also provide exclusive discount codes that can save
                 you 5-20% on your purchase.
               </p>
             </section>
@@ -188,7 +188,8 @@ export default function AboutPage() {
                   { store: 'Shop4Tesla', code: '10', percent: 10 },
                   { store: 'Snuuzu', code: 'KLEPPE', percent: 10 },
                   { store: 'Havnby', code: 'AWD', percent: 10 },
-                  { store: 'Tesloid', code: 'AWD', percent: 5 },
+                  { store: 'Yeslak', code: 'discount', percent: 20 },
+                  { store: 'Hansshow', code: 'FREDRIK', percent: 20 },
                 ].map(d => (
                   <div key={d.store} style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: '#111', marginBottom: 4 }}>{d.store}</div>

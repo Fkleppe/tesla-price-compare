@@ -221,15 +221,66 @@ export default async function Top10ListPage({ params }: Props) {
                 fontSize: 13,
                 fontWeight: 600
               }}>
-                Updated January 2026
+                Updated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </div>
             </div>
           </section>
 
-          <div style={{ display: 'flex', gap: 32 }}>
+          <style dangerouslySetInnerHTML={{ __html: `
+            .top10-layout {
+              display: flex;
+              gap: 32px;
+            }
+            .top10-sidebar {
+              width: 280px;
+              flex-shrink: 0;
+            }
+            .top10-main {
+              flex: 1;
+              min-width: 0;
+            }
+            .top10-product-card {
+              display: flex;
+            }
+            .top10-product-image {
+              width: 280px;
+              height: 210px;
+              flex-shrink: 0;
+            }
+            @media (max-width: 768px) {
+              .top10-product-card {
+                flex-direction: column;
+              }
+              .top10-product-image {
+                width: 100%;
+                height: 200px;
+              }
+            }
+            @media (max-width: 1024px) {
+              .top10-layout {
+                flex-direction: column;
+              }
+              .top10-sidebar {
+                width: 100%;
+              }
+              .top10-sidebar-inner {
+                position: static !important;
+              }
+              .top10-sidebar-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px !important;
+              }
+              .top10-sidebar-links a {
+                padding: 8px 14px !important;
+              }
+            }
+          `}} />
+          <div className="top10-layout">
             {/* Sidebar - Other Lists */}
-            <aside style={{ width: 280, flexShrink: 0 }}>
-              <div style={{
+            <aside className="top10-sidebar">
+              <div className="top10-sidebar-inner" style={{
                 background: '#fff',
                 borderRadius: 16,
                 border: '1px solid #e5e7eb',
@@ -240,7 +291,7 @@ export default async function Top10ListPage({ params }: Props) {
                 <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
                   <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>All Top 10 Lists</h2>
                 </div>
-                <div style={{ padding: '8px' }}>
+                <div className="top10-sidebar-links" style={{ padding: '8px' }}>
                   {TOP_10_LISTS.map(item => (
                     <Link
                       key={item.id}
@@ -264,7 +315,7 @@ export default async function Top10ListPage({ params }: Props) {
             </aside>
 
             {/* Main Content - Top 10 Products SSR */}
-            <div style={{ flex: 1 }}>
+            <div className="top10-main">
               {topProducts.length === 0 ? (
                 <div style={{
                   background: '#fff',
@@ -295,12 +346,12 @@ export default async function Top10ListPage({ params }: Props) {
                         key={index}
                         itemScope
                         itemType="https://schema.org/Product"
+                        className="top10-product-card"
                         style={{
                           background: '#fff',
                           borderRadius: 16,
                           border: index === 0 ? '2px solid #fbbf24' : '1px solid #e5e7eb',
                           overflow: 'hidden',
-                          display: 'flex',
                           position: 'relative'
                         }}
                       >
@@ -325,7 +376,7 @@ export default async function Top10ListPage({ params }: Props) {
                         </div>
 
                         {/* Product Image */}
-                        <div style={{ width: 280, height: 210, flexShrink: 0, background: '#fafafa', position: 'relative' }}>
+                        <div className="top10-product-image" style={{ background: '#fafafa', position: 'relative' }}>
                           {product.image && (
                             <Image
                               src={product.image}
@@ -426,7 +477,7 @@ export default async function Top10ListPage({ params }: Props) {
                             <a
                               href={affiliateUrl}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener noreferrer sponsored"
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -473,7 +524,7 @@ export default async function Top10ListPage({ params }: Props) {
           </div>
         </main>
 
-        <Footer />
+        <Footer stats={{ totalProducts: stats.totalProducts, totalStores: stats.totalStores, maxSavings: 20 }} />
       </div>
     </>
   );

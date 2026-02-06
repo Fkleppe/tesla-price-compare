@@ -140,25 +140,6 @@ const CATEGORY_NAMES: Record<string, string> = {
   'other': 'Tesla Accessories',
 };
 
-// Seller ratings based on established vendor reputation
-const SELLER_RATINGS: Record<string, { rating: number; reviewCount: number }> = {
-  'Tesla Shop': { rating: 4.8, reviewCount: 12500 },
-  'Tesmanian': { rating: 4.7, reviewCount: 8200 },
-  'Abstract Ocean': { rating: 4.6, reviewCount: 5800 },
-  'EVANNEX': { rating: 4.5, reviewCount: 4200 },
-  'RPM Tesla': { rating: 4.6, reviewCount: 3100 },
-  'Taptes': { rating: 4.4, reviewCount: 6500 },
-  'TEMAI': { rating: 4.3, reviewCount: 2800 },
-  'Tesery': { rating: 4.4, reviewCount: 3500 },
-  'TeslaTips': { rating: 4.5, reviewCount: 1200 },
-  'Jowua': { rating: 4.5, reviewCount: 2100 },
-  'Shop4Tesla': { rating: 4.3, reviewCount: 1800 },
-  'Snuuzu': { rating: 4.4, reviewCount: 950 },
-  'Havnby': { rating: 4.3, reviewCount: 620 },
-  'Yeslak': { rating: 4.2, reviewCount: 1400 },
-  'Hansshow': { rating: 4.1, reviewCount: 2300 },
-};
-const DEFAULT_SELLER_RATING = { rating: 4.2, reviewCount: 100 };
 
 function formatCategory(cat: string): string {
   return CATEGORY_NAMES[cat] || cat.split('-').map(word =>
@@ -265,14 +246,14 @@ function generateProductJsonLd(product: Product, slug: string) {
   const modelNames = product.models?.filter(m => m !== 'universal').map(m => MODEL_NAMES[m] || m).join(', ') || 'all Tesla vehicles';
   const categoryName = CATEGORY_NAMES[product.category] || product.category;
 
-  // Generate a proper description
-  const description = product.description ||
-    `Premium ${categoryName.toLowerCase()} designed specifically for ${modelNames}. ` +
-    `High-quality Tesla accessory from ${product.source}. ` +
-    `Perfect fit and easy installation. Ships with manufacturer warranty.`;
-
-  // Get seller rating for aggregateRating
-  const sellerRating = SELLER_RATINGS[product.source] || DEFAULT_SELLER_RATING;
+  // Use actual product description if available and substantial
+  const productDesc = product.description?.trim() || '';
+  const hasGoodDescription = productDesc.length > 50;
+  const description = hasGoodDescription
+    ? productDesc
+    : `Premium ${categoryName.toLowerCase()} designed specifically for ${modelNames}. ` +
+      `High-quality Tesla accessory from ${product.source}. ` +
+      `Perfect fit and easy installation. Ships with manufacturer warranty.`;
 
   return {
     '@context': 'https://schema.org',
@@ -287,27 +268,6 @@ function generateProductJsonLd(product: Product, slug: string) {
       name: product.vendor || product.source,
     },
     category: categoryName,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: sellerRating.rating.toFixed(1),
-      reviewCount: sellerRating.reviewCount,
-      bestRating: '5',
-      worstRating: '1',
-    },
-    review: {
-      '@type': 'Review',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: sellerRating.rating.toFixed(1),
-        bestRating: '5',
-        worstRating: '1',
-      },
-      author: {
-        '@type': 'Organization',
-        name: product.source,
-      },
-      reviewBody: `Quality Tesla accessory from ${product.source}. This ${categoryName.toLowerCase()} is designed for ${modelNames}.`,
-    },
     offers: {
       '@type': 'Offer',
       url: `${SITE_URL}/product/${slug}`,
@@ -468,15 +428,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 {formatCategory(product.category)}
               </Link>
               <span aria-hidden="true">›</span>
-              <span style={{ color: '#111' }} aria-current="page">{product.title.slice(0, 50)}...</span>
+              <span style={{ color: '#111' }} aria-current="page">{product.title.length > 50 ? `${product.title.slice(0, 50)}...` : product.title}</span>
             </div>
           </div>
         </nav>
 
         {/* Main Content - Critical SEO Section (SSR) */}
         <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+          <style dangerouslySetInnerHTML={{ __html: `
+            .product-layout {
+              display: grid;
+              grid-template-columns: 1fr 440px;
+              gap: 48px;
+            }
+            @media (max-width: 1024px) {
+              .product-layout {
+                grid-template-columns: 1fr 360px;
+                gap: 32px;
+              }
+            }
+            @media (max-width: 768px) {
+              .product-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+              }
+            }
+          `}} />
           <article itemScope itemType="https://schema.org/Product">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 48 }}>
+            <div className="product-layout">
 
               {/* Left Column - Product Image (SSR) */}
               <div>
@@ -675,7 +654,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <a
                     href={affiliateUrl}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer sponsored"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -700,11 +679,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                   {/* Product Description - Important for SEO */}
                   <div itemProp="description" style={{ marginTop: 20 }}>
-                    <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
-                      {formatCategory(product.category)} designed for Tesla {modelNames}.
-                      Available from {product.source} with fast shipping and easy returns.
-                      {discountInfo && ` Save ${discountInfo.percent}% with exclusive discount code ${discountInfo.code}.`}
-                    </p>
+                    {product.description && product.description.trim().length > 50 ? (
+                      <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                        {product.description.trim()}
+                        {discountInfo && ` Save ${discountInfo.percent}% with exclusive discount code ${discountInfo.code}.`}
+                      </p>
+                    ) : (
+                      <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7 }}>
+                        {formatCategory(product.category)} designed for Tesla {modelNames}.
+                        Available from {product.source} with fast shipping and easy returns.
+                        {discountInfo && ` Save ${discountInfo.percent}% with exclusive discount code ${discountInfo.code}.`}
+                      </p>
+                    )}
                   </div>
 
                   {/* Store Info */}

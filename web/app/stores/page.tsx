@@ -212,7 +212,7 @@ export default function StoresPage() {
                 <a
                   href={`https://${partner.domains[0]}`}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer sponsored"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

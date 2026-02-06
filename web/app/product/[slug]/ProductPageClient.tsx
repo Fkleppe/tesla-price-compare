@@ -1177,7 +1177,7 @@ export default function ProductPageClient({
                   <a
                     href={affiliateUrl}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer sponsored"
                     style={{
                       display: 'flex',
                       alignItems: 'center',

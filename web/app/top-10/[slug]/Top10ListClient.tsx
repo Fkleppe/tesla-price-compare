@@ -513,7 +513,7 @@ export default function Top10ListClient({ list, initialProducts }: Top10ListClie
                             <a
                               href={affiliateUrl}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener noreferrer sponsored"
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',

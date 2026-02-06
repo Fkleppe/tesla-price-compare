@@ -525,7 +525,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                           </div>
                         </Link>
                         <div className="product-footer">
-                          <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" className="buy-btn">
+                          <a href={affiliateUrl} target="_blank" rel="noopener noreferrer sponsored" className="buy-btn">
                             <span>Shop at {p.source}</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M5 12h14M12 5l7 7-7 7" />
@@ -675,7 +675,7 @@ export default function HomeClient({ initialProducts, initialMatches, stats, ini
                         </div>
                       )}
                     </div>
-                    <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" className={`store-btn ${i === 0 ? 'primary' : ''}`}>
+                    <a href={affiliateUrl} target="_blank" rel="noopener noreferrer sponsored" className={`store-btn ${i === 0 ? 'primary' : ''}`}>
                       Shop
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 12h14M12 5l7 7-7 7" />

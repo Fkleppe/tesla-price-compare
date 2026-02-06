@@ -111,7 +111,7 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
           <a
             href={affiliateUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer sponsored"
             className="visit-btn"
           >
             <span>Shop at {product.source}</span>

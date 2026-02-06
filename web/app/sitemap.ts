@@ -1,33 +1,20 @@
 import { MetadataRoute } from 'next';
-import { TESLA_MODELS, CATEGORIES, TOP_10_LISTS, generateSlug, SITE_URL } from '@/lib/constants';
-import { isAffiliatePartner } from '@/lib/affiliate';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { SITE_URL, TESLA_MODELS, CATEGORIES, TOP_10_LISTS, generateSlug } from '@/lib/constants';
+import { isAffiliatePartner } from '@/lib/affiliate';
 
 interface Product {
   title: string;
-  url: string;
   price: number;
-  scrapedAt?: string;
+  url: string;
   models?: string[];
   category?: string;
-  source?: string;
 }
 
-interface ProductMatch {
-  products: { source: string }[];
-}
-
-interface ProductsResult {
-  products: Product[];
-  lastScrapedAt: Date;
-}
-
-const AFFILIATE_STORES = ['tesery', 'yeslak', 'hansshow', 'jowua', 'tesmanian', 'tesloid', 'shop4tesla', 'snuuzu', 'havnby'];
-
-async function getMatches(): Promise<ProductMatch[]> {
+async function getProducts(): Promise<Product[]> {
   try {
-    const dataPath = path.join(process.cwd(), 'data', 'matches.json');
+    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     return JSON.parse(data);
   } catch {
@@ -35,119 +22,63 @@ async function getMatches(): Promise<ProductMatch[]> {
   }
 }
 
-function getStoreComparisonSlugs(matches: ProductMatch[]): string[] {
-  const isAffiliate = (source: string) =>
-    AFFILIATE_STORES.some(a => source.toLowerCase().includes(a));
-
-  const pairMap = new Map<string, number>();
-
-  for (const match of matches) {
-    const stores = [...new Set(
-      match.products
-        .filter(p => isAffiliate(p.source))
-        .map(p => {
-          for (const key of AFFILIATE_STORES) {
-            if (p.source.toLowerCase().includes(key)) return key;
-          }
-          return p.source.toLowerCase();
-        })
-    )].sort();
-
-    if (stores.length >= 2) {
-      for (let i = 0; i < stores.length; i++) {
-        for (let j = i + 1; j < stores.length; j++) {
-          const key = `${stores[i]}-vs-${stores[j]}`;
-          pairMap.set(key, (pairMap.get(key) || 0) + 1);
-        }
-      }
-    }
-  }
-
-  return Array.from(pairMap.entries())
-    .filter(([, count]) => count >= 2)
-    .map(([slug]) => slug);
-}
-
-async function getProducts(): Promise<ProductsResult> {
-  try {
-    const dataPath = path.join(process.cwd(), 'data', 'latest.json');
-    const data = await fs.readFile(dataPath, 'utf-8');
-    const products: Product[] = JSON.parse(data);
-
-    // Find the most recent scrape date
-    const scrapeDates = products
-      .filter(p => p.scrapedAt)
-      .map(p => new Date(p.scrapedAt!).getTime());
-    const lastScrapedAt = scrapeDates.length > 0
-      ? new Date(Math.max(...scrapeDates))
-      : new Date();
-
-    return { products, lastScrapedAt };
-  } catch {
-    return { products: [], lastScrapedAt: new Date() };
-  }
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { products, lastScrapedAt } = await getProducts();
-  const baseUrl = SITE_URL;
+  const products = await getProducts();
+  const affiliateProducts = products.filter(p => isAffiliatePartner(p.url) && p.price >= 10);
 
-  // Static pages - use last scrape date for dynamic content pages
+  const now = new Date();
+
+  // Static pages — only include lastModified for pages with dynamic data
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
-      lastModified: lastScrapedAt,
+      url: SITE_URL,
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/about`,
-      lastModified: new Date('2025-01-20'), // Static content - set manually
+      url: `${SITE_URL}/about`,
       changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${SITE_URL}/stores`,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/model`,
+      lastModified: now,
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/top-10`,
-      lastModified: lastScrapedAt,
+      url: `${SITE_URL}/category`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/top-10`,
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/stores`,
-      lastModified: lastScrapedAt,
+      url: `${SITE_URL}/compare`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
-      url: `${baseUrl}/model`,
-      lastModified: lastScrapedAt,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/category`,
-      lastModified: lastScrapedAt,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date('2025-01-14'), // Static content - set manually
+      url: `${SITE_URL}/privacy`,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date('2025-01-14'), // Static content - set manually
+      url: `${SITE_URL}/terms`,
       changeFrequency: 'yearly',
       priority: 0.3,
-    },
-    // AI/LLM context files for GEO
-    {
-      url: `${baseUrl}/llms.txt`,
-      lastModified: lastScrapedAt,
-      changeFrequency: 'daily',
-      priority: 0.5,
     },
   ];
 
@@ -155,79 +86,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const modelPages: MetadataRoute.Sitemap = TESLA_MODELS
     .filter(m => m.id !== 'universal')
     .map(model => ({
-      url: `${baseUrl}/model/${model.id}`,
-      lastModified: lastScrapedAt,
+      url: `${SITE_URL}/model/${model.id}`,
+      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));
 
   // Category pages
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map(category => ({
-    url: `${baseUrl}/category/${category.id}`,
-    lastModified: lastScrapedAt,
+    url: `${SITE_URL}/category/${category.id}`,
+    lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.8,
+    priority: 0.75,
   }));
 
-  // Top 10 list pages (clean URLs)
+  // Top 10 pages
   const top10Pages: MetadataRoute.Sitemap = TOP_10_LISTS.map(list => ({
-    url: `${baseUrl}/top-10/${list.id}`,
-    lastModified: lastScrapedAt,
+    url: `${SITE_URL}/top-10/${list.id}`,
+    lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.85,
+    priority: 0.9,
   }));
 
-  // Model + Category combination pages (pSEO)
-  const affiliateProducts = products.filter(p => isAffiliatePartner(p.url));
+  // Model + Category combination pages
   const modelCategoryPages: MetadataRoute.Sitemap = [];
-
   for (const model of TESLA_MODELS.filter(m => m.id !== 'universal')) {
     for (const category of CATEGORIES) {
+      // Only include if products exist for this combination
       const hasProducts = affiliateProducts.some(
         p => p.models?.includes(model.id) && p.category === category.id
       );
       if (hasProducts) {
         modelCategoryPages.push({
-          url: `${baseUrl}/model/${model.id}/${category.id}`,
-          lastModified: lastScrapedAt,
-          changeFrequency: 'weekly' as const,
-          priority: 0.75,
+          url: `${SITE_URL}/model/${model.id}/${category.id}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.7,
         });
       }
     }
   }
 
-  // Store comparison pages
-  const matches = await getMatches();
-  const comparisonSlugs = getStoreComparisonSlugs(matches);
-  const comparePages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/compare`,
-      lastModified: lastScrapedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    },
-    ...comparisonSlugs.map(slug => ({
-      url: `${baseUrl}/compare/${slug}`,
-      lastModified: lastScrapedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    })),
-  ];
-
-  // Product pages - include ALL products, prioritize affiliate partners
-  // Use each product's actual scrape date for accurate lastModified
+  // Product pages - prioritize affiliate products, limit to 5000 for performance
   const seenSlugs = new Set<string>();
-  const sortedProducts = products
-    .filter(p => p.price >= 10)
-    .sort((a, b) => {
-      const aAffiliate = isAffiliatePartner(a.url) ? 1 : 0;
-      const bAffiliate = isAffiliatePartner(b.url) ? 1 : 0;
-      if (aAffiliate !== bAffiliate) return bAffiliate - aAffiliate;
-      return b.price - a.price;
-    });
-
-  const productPages: MetadataRoute.Sitemap = sortedProducts
+  const productPages: MetadataRoute.Sitemap = affiliateProducts
+    .sort((a, b) => b.price - a.price) // Higher price products first
+    .slice(0, 5000)
     .filter(product => {
       const slug = generateSlug(product.title);
       if (seenSlugs.has(slug)) return false;
@@ -235,10 +139,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return true;
     })
     .map(product => ({
-      url: `${baseUrl}/product/${generateSlug(product.title)}`,
-      lastModified: product.scrapedAt ? new Date(product.scrapedAt) : lastScrapedAt,
+      url: `${SITE_URL}/product/${generateSlug(product.title)}`,
+      lastModified: now,
       changeFrequency: 'daily' as const,
-      priority: isAffiliatePartner(product.url) ? 0.7 : 0.5,
+      priority: 0.7,
     }));
 
   return [
@@ -247,7 +151,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryPages,
     ...top10Pages,
     ...modelCategoryPages,
-    ...comparePages,
     ...productPages,
   ];
 }

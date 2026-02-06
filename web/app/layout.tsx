@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+import { OrganizationJsonLd } from "@/components/JsonLd";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/constants";
 
 const inter = Inter({
@@ -27,14 +27,8 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    icon: '/icon.svg',
+    apple: '/apple-icon',
   },
   keywords: [
     "Tesla accessories",
@@ -87,6 +81,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      'en': SITE_URL,
+      'x-default': SITE_URL,
+    },
   },
 };
 
@@ -98,6 +96,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link
+          rel="preload"
+          href="/fonts/Satoshi-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-4E5VQ2M2DT"
           strategy="afterInteractive"
@@ -111,7 +116,6 @@ export default function RootLayout({
           `}
         </Script>
         <OrganizationJsonLd />
-        <WebSiteJsonLd />
       </head>
       <body className={`${inter.className} antialiased`}>
         {children}

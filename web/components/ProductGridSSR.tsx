@@ -67,7 +67,7 @@ export default function ProductGridSSR({ products }: ProductGridSSRProps) {
                   </div>
                 </Link>
                 <div className={styles.footer}>
-                  <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" className={styles.btn}>
+                  <a href={affiliateUrl} target="_blank" rel="noopener noreferrer sponsored" className={styles.btn}>
                     Shop at {product.source}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
                       <path d="M5 12h14M12 5l7 7-7 7" />
