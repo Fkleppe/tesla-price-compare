@@ -5,10 +5,10 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: `Privacy Policy | ${SITE_NAME}`,
+  title: 'Privacy Policy',
   description: 'Privacy policy for EVPriceHunt. Learn how we collect, use, and protect your information.',
   openGraph: {
-    title: `Privacy Policy | ${SITE_NAME}`,
+    title: 'Privacy Policy',
     description: 'Privacy policy for EVPriceHunt. Learn how we collect, use, and protect your information.',
     url: `${SITE_URL}/privacy`,
     siteName: SITE_NAME,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: `Privacy Policy | ${SITE_NAME}`,
+    title: 'Privacy Policy',
     description: 'Privacy policy for EVPriceHunt.',
   },
   alternates: {

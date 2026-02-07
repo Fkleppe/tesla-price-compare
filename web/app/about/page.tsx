@@ -6,7 +6,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { SITE_URL, SITE_NAME, CATEGORIES, TOP_10_LISTS } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: `About ${SITE_NAME} | Tesla Accessory Price Comparison`,
+  title: 'About Us | Tesla Accessory Price Comparison',
   description: `${SITE_NAME} compares Tesla accessory prices across multiple stores. Find the best deals on floor mats, screen protectors, chargers, and more for Model 3, Model Y, Model S, Model X, and Cybertruck.`,
   keywords: [
     'Tesla accessories',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     'EV accessories',
   ],
   openGraph: {
-    title: `About ${SITE_NAME}`,
+    title: 'About Us | Tesla Accessory Price Comparison',
     description: 'Compare Tesla accessory prices and find exclusive discount codes.',
     url: `${SITE_URL}/about`,
     siteName: SITE_NAME,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `About ${SITE_NAME}`,
+    title: 'About Us | Tesla Accessory Price Comparison',
     description: 'Compare Tesla accessory prices and find exclusive discount codes.',
   },
   alternates: {

@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: `Partner Stores | Trusted Tesla Accessory Retailers | ${SITE_NAME}`,
+  title: 'Partner Stores | Trusted Tesla Accessory Retailers',
   description: 'Shop from our verified partner stores for Tesla accessories. Get exclusive discount codes and compare prices across top retailers.',
   keywords: [
     'Tesla accessory stores',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     'EV accessory stores',
   ],
   openGraph: {
-    title: `Partner Stores | ${SITE_NAME}`,
+    title: 'Partner Stores | Trusted Tesla Accessory Retailers',
     description: 'Trusted Tesla accessory retailers with exclusive discount codes.',
     url: `${SITE_URL}/stores`,
     siteName: SITE_NAME,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `Partner Stores | ${SITE_NAME}`,
+    title: 'Partner Stores | Trusted Tesla Accessory Retailers',
     description: 'Trusted Tesla accessory retailers with exclusive discount codes.',
   },
   alternates: {

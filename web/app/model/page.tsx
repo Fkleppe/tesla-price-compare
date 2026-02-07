@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: `Tesla Model Accessories | Shop by Vehicle | ${SITE_NAME}`,
+  title: 'Tesla Model Accessories | Shop by Vehicle',
   description: 'Find accessories specifically designed for your Tesla. Browse by Model 3, Model 3 Highland, Model Y, Model Y Juniper, Model S, Model X, and Cybertruck.',
   keywords: [
     'Tesla accessories by model',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'Tesla aftermarket parts',
   ],
   openGraph: {
-    title: `Tesla Model Accessories | ${SITE_NAME}`,
+    title: 'Tesla Model Accessories | Shop by Vehicle',
     description: 'Shop accessories by Tesla model.',
     url: `${SITE_URL}/model`,
     siteName: SITE_NAME,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `Tesla Model Accessories | ${SITE_NAME}`,
+    title: 'Tesla Model Accessories | Shop by Vehicle',
     description: 'Find accessories designed for your specific Tesla model.',
   },
   alternates: {

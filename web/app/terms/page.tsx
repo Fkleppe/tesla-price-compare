@@ -5,10 +5,10 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: `Terms of Service | ${SITE_NAME}`,
+  title: 'Terms of Service',
   description: 'Terms of service for EVPriceHunt. Read our terms and conditions for using our Tesla accessory comparison website.',
   openGraph: {
-    title: `Terms of Service | ${SITE_NAME}`,
+    title: 'Terms of Service',
     description: 'Terms of service for EVPriceHunt. Read our terms and conditions.',
     url: `${SITE_URL}/terms`,
     siteName: SITE_NAME,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: `Terms of Service | ${SITE_NAME}`,
+    title: 'Terms of Service',
     description: 'Terms of service for EVPriceHunt.',
   },
   alternates: {

@@ -2,10 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { SITE_NAME } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: `Page Not Found | ${SITE_NAME}`,
+  title: 'Page Not Found',
   description: 'The page you are looking for could not be found. Browse our Tesla accessories or return to the homepage.',
   robots: {
     index: false,
