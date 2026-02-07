@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { SITE_URL, TESLA_MODELS, CATEGORIES, TOP_10_LISTS, generateSlug } from '@/lib/constants';
 import { isAffiliatePartner } from '@/lib/affiliate';
+import { isJunkProduct } from '@/lib/data';
 
 interface Product {
   title: string;
@@ -24,8 +25,7 @@ async function getProducts(): Promise<Product[]> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getProducts();
-  const allProducts = products.filter(p => p.price >= 10);
-  const affiliateProducts = allProducts.filter(p => isAffiliatePartner(p.url));
+  const allProducts = products.filter(p => p.price >= 10 && !isJunkProduct(p.title));
 
   const now = new Date();
 

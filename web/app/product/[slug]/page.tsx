@@ -6,6 +6,7 @@ import path from 'path';
 import ProductPageInteractive from './ProductPageInteractive';
 import { isAffiliatePartner, getDiscountInfo, getAffiliateUrl } from '../../../lib/affiliate';
 import { SITE_URL, generateSlug } from '../../../lib/constants';
+import { isJunkProduct } from '../../../lib/data';
 import Footer from '../../../components/Footer';
 
 interface Product {
@@ -28,7 +29,7 @@ async function getProducts(): Promise<Product[]> {
     const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
     const allProducts: Product[] = JSON.parse(data);
-    return allProducts.filter(p => p.price >= 10);
+    return allProducts.filter(p => p.price >= 10 && !isJunkProduct(p.title));
   } catch {
     return [];
   }

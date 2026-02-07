@@ -3,6 +3,7 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, CATEGORIES, TESLA_MODELS, TOP_10
 import { promises as fs } from 'fs';
 import path from 'path';
 import { isAffiliatePartner, getDiscountInfo, AFFILIATE_PARTNERS } from '@/lib/affiliate';
+import { isJunkProduct } from '@/lib/data';
 
 interface Product {
   title: string;
@@ -18,7 +19,8 @@ async function getProducts(): Promise<Product[]> {
   try {
     const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
-    return JSON.parse(data);
+    const products: Product[] = JSON.parse(data);
+    return products.filter(p => !isJunkProduct(p.title));
   } catch {
     return [];
   }

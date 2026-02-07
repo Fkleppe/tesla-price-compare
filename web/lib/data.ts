@@ -8,10 +8,17 @@ import { isAffiliatePartner, getDiscountInfo } from './affiliate';
 import allProductsData from '../data/latest.json';
 import matchesData from '../data/ai-matches.json';
 
+// Non-Tesla products that dilute topical authority
+const JUNK_TITLE_PATTERN = /rivian|lucid|polestar|bmw i[x4]|hyundai ioniq|kia ev[0-9]|ford (mach-e|lightning)|chevy (bolt|blazer)|gift.card|payment.link|dimension.upload.*dtf/i;
+
+export function isJunkProduct(title: string): boolean {
+  return JUNK_TITLE_PATTERN.test(title);
+}
+
 export function getProducts(): Product[] {
-  // Return ALL products with price >= $10
+  // Return ALL Tesla products with price >= $10, excluding non-Tesla junk
   const products = (allProductsData as Product[]).filter(
-    (p) => p.price >= 10
+    (p) => p.price >= 10 && !isJunkProduct(p.title)
   );
   return products;
 }

@@ -9,6 +9,7 @@ import { TESLA_MODELS, CATEGORIES, SITE_NAME, SITE_URL, generateSlug } from '@/l
 import { promises as fs } from 'fs';
 import path from 'path';
 import { isAffiliatePartner, getDiscountInfo } from '@/lib/affiliate';
+import { isJunkProduct } from '@/lib/data';
 import { Product } from '@/lib/types';
 
 interface Props {
@@ -19,7 +20,8 @@ async function getProducts(): Promise<Product[]> {
   try {
     const dataPath = path.join(process.cwd(), 'data', 'latest.json');
     const data = await fs.readFile(dataPath, 'utf-8');
-    return JSON.parse(data);
+    const products: Product[] = JSON.parse(data);
+    return products.filter(p => !isJunkProduct(p.title));
   } catch {
     return [];
   }
