@@ -119,42 +119,6 @@ function generateBreadcrumbJsonLd(
   };
 }
 
-// Generate FAQ JSON-LD
-function generateFAQJsonLd(
-  model: { id: string; name: string },
-  category: { id: string; name: string },
-  productCount: number,
-  lowestPrice: number,
-  highestPrice: number
-) {
-  const modelInfo = MODEL_INFO[model.id] || { name: model.name, year: '2020+' };
-
-  const faqs = [
-    {
-      question: `What are the best ${category.name.toLowerCase()} for Tesla ${model.name}?`,
-      answer: `We compare ${productCount}+ ${category.name.toLowerCase()} specifically designed for Tesla ${model.name} (${modelInfo.year}). Prices range from $${lowestPrice} to $${highestPrice}. Popular brands include Tesmanian, Tesery, and 3D MAXpider.`
-    },
-    {
-      question: `Do ${category.name.toLowerCase()} fit all Tesla ${model.name} years?`,
-      answer: `${category.name} on this page are specifically designed for Tesla ${model.name} (${modelInfo.year}). Always verify compatibility with your specific production date before purchasing.`
-    },
-    {
-      question: `Where can I buy ${category.name.toLowerCase()} for my Tesla ${model.name}?`,
-      answer: `We compare prices from trusted Tesla accessory retailers. Many products include exclusive discount codes that save you 5-20% off the regular price.`
-    },
-  ];
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
-  };
-}
-
 // Generate ItemList JSON-LD
 function generateItemListJsonLd(
   products: Product[],
@@ -237,7 +201,6 @@ export default async function ModelCategoryPage({ params }: Props) {
   ).slice(0, 6);
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(modelData, categoryData);
-  const faqJsonLd = generateFAQJsonLd(modelData, categoryData, productCount, lowestPrice, highestPrice);
   const itemListJsonLd = generateItemListJsonLd(sortedProducts, modelData, categoryData);
 
   const stats = {
@@ -251,10 +214,6 @@ export default async function ModelCategoryPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"

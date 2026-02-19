@@ -52,62 +52,6 @@ export default function Home() {
     },
   };
 
-  // FAQ structured data for AI and Google
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'What is the best website to compare Tesla accessory prices?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `${SITE_NAME} compares prices from ${stats.totalStores}+ verified Tesla accessory retailers. We index ${stats.totalProducts.toLocaleString()}+ products and offer exclusive discount codes saving 5-20% off retail prices.`,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I find discount codes for Tesla accessories?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'EVPriceHunt partners with top Tesla accessory stores to provide exclusive discount codes. Look for the green "% OFF" badge on products. Active codes include: Tesery (code "123" for 5% off), Shop4Tesla (code "10" for 10% off), Snuuzu (code "KLEPPE" for 10% off), Yeslak (code "discount" for 20% off), and Hansshow (code "FREDRIK" for 20% off).',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What are the best Tesla Model Y accessories in 2026?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'The most popular Tesla Model Y accessories are: 1) All-weather TPE floor mats ($50-150), 2) 9H tempered glass screen protectors ($20-50), 3) Center console wraps and organizers ($20-80), 4) Sunshades for windshield and panoramic roof ($30-100), 5) Wireless phone charger mounts ($30-80).',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Are aftermarket Tesla accessories worth it?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, aftermarket Tesla accessories from reputable brands often match or exceed OEM quality at lower prices. Brands like Tesmanian, Tesery, 3D MAXpider, and JOWUA have excellent reputations. Always check reviews and ensure compatibility with your specific Tesla model and year.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Which stores sell the cheapest Tesla accessories?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Prices vary by product type. Tesery and Yeslak often have competitive everyday prices. JOWUA offers premium quality at higher prices. Use EVPriceHunt to compare the same product across stores - prices can differ by 20-40% for identical items.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What Tesla accessories should I buy first?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Essential Tesla accessories in order of priority: 1) All-weather floor mats to protect interior, 2) Screen protector to prevent scratches, 3) Center console organizer/wrap, 4) Sunshade for heat protection, 5) Wireless phone charger. These protect your investment and improve daily usability.',
-        },
-      },
-    ],
-  };
-
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -136,10 +80,6 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"

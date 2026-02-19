@@ -72,34 +72,6 @@ function generateBreadcrumbJsonLd(list: { id: string; title: string }) {
   };
 }
 
-function generateTop10FAQJsonLd(list: { id: string; title: string; description: string }) {
-  const categoryName = list.title.replace('Best ', '').replace('Tesla ', '');
-  const faqs = [
-    {
-      question: `What are the ${list.title.toLowerCase()} in 2026?`,
-      answer: `${list.description} We compare products based on customer reviews, materials, and price.`
-    },
-    {
-      question: `How do you choose the ${categoryName.toLowerCase()} for this list?`,
-      answer: `We look at: (1) Customer reviews, (2) Materials and construction, (3) Price, (4) Tesla model compatibility, (5) Discount availability.`
-    },
-    {
-      question: `Are there any discount codes for ${categoryName.toLowerCase()}?`,
-      answer: `Yes! Many products have exclusive discount codes that save you 5-20% off. Look for the green "% OFF" badge.`
-    },
-  ];
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
-  };
-}
-
 function generateItemListJsonLd(products: Product[], listTitle: string) {
   return {
     '@context': 'https://schema.org',
@@ -162,7 +134,6 @@ export default async function Top10ListPage({ params }: Props) {
   };
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(list);
-  const faqJsonLd = generateTop10FAQJsonLd(list);
   const itemListJsonLd = generateItemListJsonLd(topProducts, list.title);
 
   return (
@@ -170,10 +141,6 @@ export default async function Top10ListPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"

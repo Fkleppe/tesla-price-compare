@@ -7,31 +7,10 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/private/'],
-      },
-      // AI crawlers - explicit allow for context files
-      {
-        userAgent: 'GPTBot',
-        allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
+        disallow: ['/api/', '/private/', '/borser/'],
       },
       {
-        userAgent: 'ChatGPT-User',
-        allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
-      },
-      {
-        userAgent: 'Claude-Web',
-        allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
-      },
-      {
-        userAgent: 'Anthropic-AI',
-        allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
-      },
-      {
-        userAgent: 'PerplexityBot',
-        allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
-      },
-      {
-        userAgent: 'Amazonbot',
+        userAgent: ['GPTBot', 'ChatGPT-User', 'Claude-Web', 'Anthropic-AI', 'PerplexityBot', 'Amazonbot'],
         allow: ['/llms.txt', '/api/ai-context', '/.well-known/ai.txt'],
       },
     ],

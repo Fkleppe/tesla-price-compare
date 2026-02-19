@@ -8,5 +8,4 @@ export {
   ProductJsonLd,
   OrganizationJsonLd,
   ItemListJsonLd,
-  FAQJsonLd,
 } from './JsonLd';

@@ -117,44 +117,6 @@ function generateBreadcrumbJsonLd(category: { id: string; name: string }) {
   };
 }
 
-// Generate FAQ JSON-LD for category
-function generateCategoryFAQJsonLd(category: { id: string; name: string; description: string }, productCount: number, lowestPrice: number) {
-  const seoContent = CATEGORY_SEO[category.id] || CATEGORY_SEO['default'];
-
-  const faqs = [
-    {
-      question: `What are the best ${category.name.toLowerCase()} for Tesla?`,
-      answer: `${seoContent.longDescription} We compare ${productCount}+ ${category.name.toLowerCase()} from trusted retailers to help you find the best option for your Tesla.`
-    },
-    {
-      question: `How much do Tesla ${category.name.toLowerCase()} cost?`,
-      answer: `Tesla ${category.name.toLowerCase()} range from $${lowestPrice.toFixed(0)} to several hundred dollars depending on features and brand. Use our price comparison tool to find the best deals.`
-    },
-    {
-      question: `Are aftermarket ${category.name.toLowerCase()} as good as Tesla OEM?`,
-      answer: `Many aftermarket ${category.name.toLowerCase()} are as good as or better than Tesla OEM, often at lower prices. Brands like Tesmanian, Tesery, and 3D MAXpider have good reputations.`
-    },
-    {
-      question: `How do I choose the right ${category.name.toLowerCase()} for my Tesla?`,
-      answer: seoContent.buyingTips.join('. ') + '. Always verify compatibility with your specific Tesla model and year.'
-    },
-    {
-      question: `Do you offer discount codes for Tesla ${category.name.toLowerCase()}?`,
-      answer: `Yes! We partner with top Tesla accessory stores to offer exclusive discount codes. Many products have codes that save you 5-20% off the regular price.`
-    },
-  ];
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
-  };
-}
-
 // Generate ItemList JSON-LD for products
 function generateItemListJsonLd(products: Product[], categoryName: string) {
   return {
@@ -198,9 +160,6 @@ export default async function CategoryPage({ params }: Props) {
 
   // Calculate stats
   const productCount = categoryProducts.length;
-  const lowestPrice = categoryProducts.length > 0
-    ? Math.min(...categoryProducts.map(p => p.price))
-    : 50;
   const discountedCount = categoryProducts.filter(p => getDiscountInfo(p.url) !== null).length;
   const totalStores = new Set(categoryProducts.map(p => p.source)).size;
 
@@ -215,7 +174,6 @@ export default async function CategoryPage({ params }: Props) {
     .slice(0, 24);
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(category);
-  const faqJsonLd = generateCategoryFAQJsonLd(category, productCount, lowestPrice);
   const itemListJsonLd = generateItemListJsonLd(initialProducts, category.name);
   const seoContent = CATEGORY_SEO[category.id] || CATEGORY_SEO['default'];
 
@@ -230,10 +188,6 @@ export default async function CategoryPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
@@ -386,7 +340,7 @@ export default async function CategoryPage({ params }: Props) {
           {/* Interactive Filters and Full Product List */}
           <CategoryPageInteractive
             category={category}
-            initialProducts={products}
+            initialProducts={categoryProducts.filter(p => isAffiliatePartner(p.url))}
           />
         </main>
 

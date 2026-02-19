@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 
 interface HeroSectionProps {
   stats: {
@@ -12,26 +11,23 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ stats }: HeroSectionProps) {
-  // Use state initializer to avoid hydration mismatch
-  const [mounted] = useState(() => typeof window !== 'undefined');
-
   return (
     <>
       <section className="hero">
         <div className="hero-inner">
           {/* Eyebrow */}
-          <span className={`eyebrow ${mounted ? 'visible' : ''}`}>
+          <span className="eyebrow">
             <span className="pulse" />
-            {stats.totalStores} stores · {stats.totalProducts.toLocaleString()} products
+            {stats.totalStores} stores &middot; {stats.totalProducts.toLocaleString()} products
           </span>
 
           {/* Headline */}
-          <h1 className={`headline ${mounted ? 'visible' : ''}`}>
+          <h1 className="headline">
             Compare <span className="accent">Tesla</span> accessory prices
           </h1>
 
           {/* Actions */}
-          <div className={`actions ${mounted ? 'visible' : ''}`}>
+          <div className="actions">
             <Link href="/#products" className="btn-primary">
               Browse all
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -77,14 +73,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           font-weight: 500;
           letter-spacing: 0.02em;
           color: rgba(255, 255, 255, 0.5);
-          opacity: 0;
-          transform: translateY(8px);
-          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .eyebrow.visible {
-          opacity: 1;
-          transform: translateY(0);
+          animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .pulse {
@@ -101,6 +90,11 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
         }
 
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         /* Headline */
         .headline {
           font-size: clamp(1.5rem, 4vw, 2.25rem);
@@ -108,14 +102,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           line-height: 1.2;
           letter-spacing: -0.035em;
           color: rgba(255, 255, 255, 0.95);
-          opacity: 0;
-          transform: translateY(12px);
-          transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
-        }
-
-        .headline.visible {
-          opacity: 1;
-          transform: translateY(0);
+          animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
         }
 
         .headline .accent {
@@ -130,14 +117,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           align-items: center;
           gap: 0.5rem;
           margin-top: 0.25rem;
-          opacity: 0;
-          transform: translateY(10px);
-          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
-        }
-
-        .actions.visible {
-          opacity: 1;
-          transform: translateY(0);
+          animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
         }
 
         .hero :global(.btn-primary) {

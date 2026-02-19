@@ -129,36 +129,6 @@ function generateBreadcrumbJsonLd(model: { id: string; name: string }) {
   };
 }
 
-// Generate FAQ JSON-LD
-function generateModelFAQJsonLd(model: { id: string; name: string }, productCount: number, lowestPrice: number) {
-  const modelSeo = MODEL_SEO[model.id] || MODEL_SEO['model-y'];
-
-  const faqs = [
-    {
-      question: `What accessories does my Tesla ${model.name} need?`,
-      answer: `Common accessories for Tesla ${model.name} include: ${modelSeo.popularAccessories.join(', ')}. ${modelSeo.description}`
-    },
-    {
-      question: `What year Tesla ${model.name} are these accessories for?`,
-      answer: `Our ${model.name} accessories are compatible with ${modelSeo.year} model years. Always verify compatibility with your specific production date.`
-    },
-    {
-      question: `How much do Tesla ${model.name} accessories cost?`,
-      answer: `Tesla ${model.name} accessories start from $${lowestPrice.toFixed(0)}. We compare ${productCount}+ products from trusted retailers.`
-    },
-  ];
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
-  };
-}
-
 // Generate ItemList JSON-LD
 function generateItemListJsonLd(products: Product[], modelName: string) {
   return {
@@ -202,9 +172,6 @@ export default async function ModelPage({ params }: Props) {
 
   // Calculate stats
   const productCount = modelProducts.length;
-  const lowestPrice = modelProducts.length > 0
-    ? Math.min(...modelProducts.map(p => p.price))
-    : 30;
   const discountedCount = modelProducts.filter(p => getDiscountInfo(p.url) !== null).length;
   const totalStores = new Set(modelProducts.map(p => p.source)).size;
 
@@ -225,7 +192,6 @@ export default async function ModelPage({ params }: Props) {
 
   const modelSeo = MODEL_SEO[model.id] || MODEL_SEO['model-y'];
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(model);
-  const faqJsonLd = generateModelFAQJsonLd(model, productCount, lowestPrice);
   const itemListJsonLd = generateItemListJsonLd(initialProducts, model.name);
 
   const stats = {
@@ -239,10 +205,6 @@ export default async function ModelPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
@@ -423,7 +385,7 @@ export default async function ModelPage({ params }: Props) {
           {/* Interactive Filters and Full Product List */}
           <ModelPageInteractive
             model={model}
-            initialProducts={products}
+            initialProducts={modelProducts.filter(p => isAffiliatePartner(p.url))}
           />
         </main>
 
